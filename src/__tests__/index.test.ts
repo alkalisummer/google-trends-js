@@ -19,16 +19,6 @@ describe('GoogleTrendsApi', () => {
       expect(result).toHaveProperty('summary');
     });
 
-    it('should return trending topics for different time ranges', async () => {
-      const result = await GoogleTrendsApi.dailyTrends({
-        geo: 'US',
-        trendingHours: GoogleTrendsTrendingHours.fourHrs
-      });
-      expect(result).toBeDefined();
-      expect(result).toHaveProperty('allTrendingStories');
-      expect(result).toHaveProperty('summary');
-    });
-
     it('should handle errors gracefully', async () => {
       const result = await GoogleTrendsApi.dailyTrends({
         geo: 'INVALID_GEO'
@@ -39,10 +29,32 @@ describe('GoogleTrendsApi', () => {
       });
     });
 
-    it('should return trending topics for seven days', async () => {
-      const result = await GoogleTrendsApi.dailyTrends({
+  });
+
+  describe('realTimeTrends', () => {
+    it('should return realtime trends', async () => {
+      const result = await GoogleTrendsApi.realTimeTrends({
+        geo: 'US'
+      });
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('allTrendingStories');
+      expect(result).toHaveProperty('summary');
+    });
+
+    it('should return realtime trernds for different 4 hours', async () => {
+      const result = await GoogleTrendsApi.realTimeTrends({
         geo: 'US',
-        trendingHours: GoogleTrendsTrendingHours.sevenDays
+        trendingHours: 4
+      });
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('allTrendingStories');
+      expect(result).toHaveProperty('summary');
+    });
+
+    it('should return realtime trernds for different 2 hours', async () => {
+      const result = await GoogleTrendsApi.realTimeTrends({
+        geo: 'US',
+        trendingHours: 1
       });
       expect(result).toBeDefined();
       expect(result).toHaveProperty('allTrendingStories');

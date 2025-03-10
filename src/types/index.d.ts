@@ -21,10 +21,16 @@ export const enum GoogleTrendsTrendingHours {
 
 export type DailyTrendingTopicsOptions = {
     geo: string;
-    trendingHours?: GoogleTrendsTrendingHours;
 }
 
 export type DailyTrendingTopics = {
     allTrendingStories: unknown[];
     summary: string[];
+}
+
+// Real Time Trends
+
+export type RealTimeTrendsOptions = {
+    geo: string;
+    trendingHours?: number;
 }

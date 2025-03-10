@@ -1,10 +1,44 @@
-import { DailyTrendingTopics, DailyTrendingTopicsOptions, GoogleTrendsEndpoints } from '../types/index';
+import { DailyTrendingTopics, DailyTrendingTopicsOptions, GoogleTrendsEndpoints, RealTimeTrendsOptions } from '../types/index';
 import { request } from './request';
 import { extractJsonFromResponse } from './format';
 import { GOOGLE_TRENDS_MAPPER } from '../constants';
 
 export class GoogleTrendsApi {
-  async dailyTrends({ geo = "US", trendingHours = 24 }: DailyTrendingTopicsOptions): Promise<DailyTrendingTopics> {
+  async dailyTrends({ geo = "US" }: DailyTrendingTopicsOptions): Promise<DailyTrendingTopics> {
+    const defaultOptions =
+      GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.dailyTrends];
+
+    const options = {
+      ...defaultOptions,
+      body: new URLSearchParams({
+        'f.req':
+          `[[["i0OFE","[null,null,\\"${geo}\\",0,\\"en\\",24,1]",null,"generic"]]]`,
+      }).toString(),
+    };
+
+    try {
+      const response = await request(options.url, options);
+      const text = await response.text();
+      const trendingTopics = extractJsonFromResponse(text);
+
+      if (!trendingTopics) {
+        return {
+          allTrendingStories: [],
+          summary: [],
+        }
+      }
+
+      return trendingTopics;
+    } catch (error) {
+      console.error(error);
+      return {
+        allTrendingStories: [],
+        summary: [],
+      }
+    }
+  }
+
+  async realTimeTrends({ geo = "US", trendingHours = 4 }: RealTimeTrendsOptions): Promise<DailyTrendingTopics> {
     const defaultOptions =
       GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.dailyTrends];
 
@@ -36,7 +70,6 @@ export class GoogleTrendsApi {
         summary: [],
       }
     }
-
   }
 }
 
