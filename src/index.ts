@@ -1,4 +1,3 @@
-export { Uuid } from './helpers/uuid';
-import uuid from './helpers/uuid';
+import GoogleTrendsApi from './helpers/googleTrendsAPI';
 
-export default uuid;
+export default GoogleTrendsApi;

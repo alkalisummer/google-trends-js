@@ -17,7 +17,7 @@
     "postversion": "git push && git push --tags"
   },
   "repository": {
-    "type": "git",
+    "type": "git"
   },
   "keywords": [
     "boilerplate",
