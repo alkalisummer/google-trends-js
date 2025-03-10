@@ -1,14 +1,4 @@
-export type GoogleTrendsMapper = {
-  path: string;
-  method: string;
-  host: string;
-  url: string;
-  headers: Record<string, string>;
-};
-
-export enum GoogleTrendsEndpoints {
-  dailyTrends = 'dailyTrends',
-}
+import { GoogleTrendsEndpoints, GoogleTrendsMapper } from "./types";
 
 const GOOGLE_TRENDS_BASE_URL = 'trends.google.com';
 
@@ -23,6 +13,6 @@ export const GOOGLE_TRENDS_MAPPER: Record<
     url: `https://${GOOGLE_TRENDS_BASE_URL}/_/TrendsUi/data/batchexecute`,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-    },
+    }
   },
 };

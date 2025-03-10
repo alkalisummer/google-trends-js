@@ -1,9 +1,8 @@
+import { DailyTrendingTopics } from "../types";
+
 export const extractJsonFromResponse = (
   text: string
-): {
-  allTrendingStories: unknown[];
-  summary: string[];
-} | null => {
+): DailyTrendingTopics | null => {
   const lines = text.split('\n');
 
   for (const line of lines) {
@@ -14,9 +13,12 @@ export const extractJsonFromResponse = (
         const intermediate = JSON.parse(trimmed);
         const data = JSON.parse(intermediate[0][2]);
 
+        if (!data || !Array.isArray(data) || data.length === 0) {
+          return null;
+        }
+
         return updateResponseObject(data[1]);
       } catch (e: unknown) {
-        console.warn(`Error parsing JSON: ${e}`);
         continue;
       }
     }
@@ -24,7 +26,7 @@ export const extractJsonFromResponse = (
   return null;
 };
 
-const updateResponseObject = (data: unknown[]) => {
+const updateResponseObject = (data: unknown[]): DailyTrendingTopics | null => {
   if (!data) {
     return null;
   }
