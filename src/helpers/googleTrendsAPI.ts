@@ -4,7 +4,7 @@ import { extractJsonFromResponse } from './format';
 import { GOOGLE_TRENDS_MAPPER } from '../constants';
 
 export class GoogleTrendsApi {
-  async dailyTrends({ geo = "US" }: DailyTrendingTopicsOptions): Promise<DailyTrendingTopics> {
+  async dailyTrends({ geo = "US", lang="en" }: DailyTrendingTopicsOptions): Promise<DailyTrendingTopics> {
     const defaultOptions =
       GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.dailyTrends];
 
@@ -12,7 +12,7 @@ export class GoogleTrendsApi {
       ...defaultOptions,
       body: new URLSearchParams({
         'f.req':
-          `[[["i0OFE","[null,null,\\"${geo}\\",0,\\"en\\",24,1]",null,"generic"]]]`,
+          `[[["i0OFE","[null,null,\\"${geo}\\",0,\\"${lang}\\",24,1]",null,"generic"]]]`,
       }).toString(),
     };
 

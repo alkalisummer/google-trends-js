@@ -20,7 +20,8 @@ export const enum GoogleTrendsTrendingHours {
 }
 
 export type DailyTrendingTopicsOptions = {
-    geo: string;
+    geo?: string;
+    lang?: string;
 }
 
 export type DailyTrendingTopics = {

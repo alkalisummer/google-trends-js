@@ -19,6 +19,23 @@ describe('GoogleTrendsApi', () => {
       expect(result).toHaveProperty('summary');
     });
 
+    it('should return trending topics for different language', async () => {
+      const resultEn = await GoogleTrendsApi.dailyTrends({ geo: 'GB' });
+      expect(resultEn).toBeDefined();
+      const result = await GoogleTrendsApi.dailyTrends({ geo: 'GB', lang:"fr" });
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('allTrendingStories');
+      expect(result).toHaveProperty('summary');
+      expect(result).not.toBe(resultEn)
+    });
+
+    it('should work with not params', async () => {
+      const result = await GoogleTrendsApi.dailyTrends({});
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('allTrendingStories');
+      expect(result).toHaveProperty('summary');
+    });
+
     it('should handle errors gracefully', async () => {
       const result = await GoogleTrendsApi.dailyTrends({
         geo: 'INVALID_GEO'

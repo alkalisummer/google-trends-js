@@ -25,7 +25,7 @@
     "npm",
     "module"
   ],
-  "author": "Hebert Cisco",
+  "author": "Shaishav Pidadi",
   "private": false,
   "publishConfig": {
     "access": "public"
