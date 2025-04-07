@@ -7,7 +7,9 @@ export type GoogleTrendsMapper = {
 };
 
 export const enum GoogleTrendsEndpoints {
-    dailyTrends = "dailyTrends"
+    dailyTrends = "dailyTrends",
+    autocomplete = "autocomplete",
+    explore = "explore"
 }
 
 // TRENDING TOPICS
@@ -34,4 +36,31 @@ export type DailyTrendingTopics = {
 export type RealTimeTrendsOptions = {
     geo: string;
     trendingHours?: number;
+}
+
+// Explore
+
+export type ExploreOptions = {
+    keyword: string;
+    geo?: string;
+    time?: string;
+    category?: number;
+    property?: string;
+    hl?: string;
+}
+
+export type ExploreResponse = {
+    widgets: Array<{
+        id: string;
+        request: {
+            comparisonItem: Array<{
+                keyword: string;
+                geo: string;
+                time: string;
+            }>;
+            category: number;
+            property: string;
+        };
+        token: string;
+    }>;
 }
