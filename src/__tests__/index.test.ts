@@ -115,4 +115,54 @@ describe('GoogleTrendsApi', () => {
     // });
   });
 
+  describe('interestByRegion', () => {
+    it('should return interest by region data for a keyword', async () => {
+      const result = await GoogleTrendsApi.interestByRegion({ 
+        keyword: 'Stock Market',
+        geo: 'US'
+      });
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('default');
+      expect(result.default).toHaveProperty('geoMapData');
+      expect(Array.isArray(result.default.geoMapData)).toBe(true);
+      expect(result.default.geoMapData.length).toBeGreaterThan(0);
+      expect(result.default.geoMapData[0]).toHaveProperty('geoCode');
+      expect(result.default.geoMapData[0]).toHaveProperty('geoName');
+      expect(result.default.geoMapData[0]).toHaveProperty('value');
+    });
+
+    // it('should return interest by region data for different geo location', async () => {
+    //   const result = await GoogleTrendsApi.interestByRegion({ 
+    //     keyword: 'Stock Market',
+    //     geo: 'GB'
+    //   });
+    //   expect(result).toBeDefined();
+    //   expect(result).toHaveProperty('default');
+    //   expect(result.default).toHaveProperty('geoMapData');
+    //   expect(Array.isArray(result.default.geoMapData)).toBe(true);
+    // });
+
+    // it('should return interest by region data for different resolution', async () => {
+    //   const result = await GoogleTrendsApi.interestByRegion({ 
+    //     keyword: 'Stock Market',
+    //     geo: 'US',
+    //     resolution: 'CITY'
+    //   });
+    //   expect(result).toBeDefined();
+    //   expect(result).toHaveProperty('default');
+    //   expect(result.default).toHaveProperty('geoMapData');
+    //   expect(Array.isArray(result.default.geoMapData)).toBe(true);
+    // });
+
+    // it('should handle empty keyword', async () => {
+    //   const result = await GoogleTrendsApi.interestByRegion({ 
+    //     keyword: '',
+    //     geo: 'US'
+    //   });
+    //   expect(result).toBeDefined();
+    //   expect(result).toHaveProperty('default');
+    //   expect(result.default).toHaveProperty('geoMapData');
+    //   expect(Array.isArray(result.default.geoMapData)).toBe(true);
+    // });
+  });
 });

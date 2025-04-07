@@ -9,7 +9,8 @@ export type GoogleTrendsMapper = {
 export const enum GoogleTrendsEndpoints {
     dailyTrends = "dailyTrends",
     autocomplete = "autocomplete",
-    explore = "explore"
+    explore = "explore",
+    interestByRegion = "interestByRegion"
 }
 
 // TRENDING TOPICS
@@ -63,4 +64,27 @@ export type ExploreResponse = {
         };
         token: string;
     }>;
+}
+
+export interface InterestByRegionOptions {
+    keyword: string;
+    geo?: string;
+    time?: string;
+    resolution?: 'COUNTRY' | 'REGION' | 'CITY' | 'DMA';
+    hl?: string;
+}
+
+export interface InterestByRegionData {
+    geoCode: string;
+    geoName: string;
+    value: number[];
+    formattedValue: string[];
+    maxValueIndex: number;
+    hasData: boolean[];
+}
+
+export interface InterestByRegionResponse {
+    default: {
+        geoMapData: InterestByRegionData[];
+    };
 }

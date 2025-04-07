@@ -29,8 +29,13 @@ export const GOOGLE_TRENDS_MAPPER: Record<
     method: 'GET',
     host: GOOGLE_TRENDS_BASE_URL,
     url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/explore`,
-    headers: {
-      'Cookie': 'NID=523=SKjL8cZqZCxCPZSsWCX-m7nxNo0xQLd4IAgNLQKryTos5nl57_QkJPK0VFanhUAn9Njc7_agcTr4GiMwgx2-LtNkjsSa5ykRiGT8Jd_hyZpip8r5Y0KNq_78rJJTVy8q1ErQwGKRmLGwewB-gkvlSXf7FtgXPNrjYwnx5YvlJiiDGtOAv8UZf-aP1ZMXFi7GAtHXStg'
-    }
+    headers: {}
+  },
+  [GoogleTrendsEndpoints.interestByRegion]: {
+    path: '/trends/api/widgetdata/comparedgeo',
+    method: 'GET',
+    host: GOOGLE_TRENDS_BASE_URL,
+    url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/widgetdata/comparedgeo`,
+    headers: {}
   }
 };

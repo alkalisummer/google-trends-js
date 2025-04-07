@@ -1,4 +1,4 @@
-import { DailyTrendingTopics, DailyTrendingTopicsOptions, GoogleTrendsEndpoints, RealTimeTrendsOptions, ExploreOptions, ExploreResponse } from '../types/index';
+import { DailyTrendingTopics, DailyTrendingTopicsOptions, GoogleTrendsEndpoints, RealTimeTrendsOptions, ExploreOptions, ExploreResponse, InterestByRegionOptions, InterestByRegionResponse } from '../types/index';
 import { request } from './request';
 import { extractJsonFromResponse } from './format';
 import { GOOGLE_TRENDS_MAPPER } from '../constants';
@@ -127,6 +127,64 @@ export class GoogleTrendsApi {
     } catch (error) {
       console.error('Explore request failed:', error);
       return { widgets: [] };
+    }
+  }
+
+  async interestByRegion({ 
+    keyword, 
+    geo = 'US', 
+    time = 'today 12-m', 
+    resolution = 'REGION',
+    hl = 'en-US',
+  }: InterestByRegionOptions): Promise<InterestByRegionResponse> {
+    // First get the widget token from explore
+    const exploreResponse = await this.explore({ keyword, geo, time, hl });
+    const widget = exploreResponse.widgets.find(w => w.id === 'GEO_MAP_0');
+    
+    if (!widget) {
+      return { default: { geoMapData: [] } };
+    }
+
+    const options = {
+      ...GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.interestByRegion],
+      qs: {
+        hl,
+        tz: '240',
+        req: JSON.stringify({
+          geo: { country: geo },
+          comparisonItem: [{
+            time,
+            complexKeywordsRestriction: {
+              keyword: [{
+                type: 'BROAD',
+                value: keyword
+              }]
+            }
+          }],
+          resolution,
+          locale: hl,
+          requestOptions: {
+            property: '',
+            backend: 'IZG',
+            category: 0
+          },
+          userConfig: {
+            userType: 'USER_TYPE_SCRAPER'
+          }
+        }),
+        token: widget.token
+      }
+    };
+
+    try {
+      const response = await request(options.url, options);
+      const text = await response.text();
+      // Remove the first 5 characters (JSONP wrapper) and parse
+      const data = JSON.parse(text.slice(5));
+      return data;
+    } catch (error) {
+      console.error('Interest by region request failed:', error);
+      return { default: { geoMapData: [] } };
     }
   }
 }
