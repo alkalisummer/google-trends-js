@@ -1,6 +1,6 @@
-import { DailyTrendingTopics } from "../types";
+import { DailyTrendingTopics } from '../types';
 
-// For future refrence and update: from google trends page rpc call response, 
+// For future refrence and update: from google trends page rpc call response,
 // 0	"twitter down"	The main trending search term.
 // 1	null	Unused (reserved for future Google Trends data).
 // 2	"US"	Country code (where the trend is happening).
@@ -16,7 +16,7 @@ import { DailyTrendingTopics } from "../types";
 // 12	"twitter down"	The original trending keyword (sometimes a duplicate of index 0).
 
 export const extractJsonFromResponse = (text: string): DailyTrendingTopics | null => {
-  const cleanedText = text.replace(/^\)\]\}'/, "").trim();
+  const cleanedText = text.replace(/^\)\]\}'/, '').trim();
   try {
     const parsedResponse = JSON.parse(cleanedText);
 
@@ -36,7 +36,7 @@ export const extractJsonFromResponse = (text: string): DailyTrendingTopics | nul
 
     return updateResponseObject(data[1]);
   } catch (e: unknown) {
-    console.error("Failed to parse response:", e);
+    console.error('Failed to parse response:', e);
     return null;
   }
 };
@@ -50,8 +50,8 @@ const updateResponseObject = (data: unknown[]): DailyTrendingTopics | null => {
   const summary: string[] = [];
 
   data.forEach((item: unknown) => {
-    if (Array.isArray(item) && typeof item[0] === "string") {
-      summary.push(item[0]); // First element is usually the trending keyword 
+    if (Array.isArray(item) && typeof item[0] === 'string') {
+      summary.push(item[0]); // First element is usually the trending keyword
     }
   });
 

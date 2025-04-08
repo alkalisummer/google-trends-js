@@ -1,11 +1,8 @@
-import { GoogleTrendsEndpoints, GoogleTrendsMapper } from "./types";
+import { GoogleTrendsEndpoints, GoogleTrendsMapper } from './types';
 
 const GOOGLE_TRENDS_BASE_URL = 'trends.google.com';
 
-export const GOOGLE_TRENDS_MAPPER: Record<
-  GoogleTrendsEndpoints,
-  GoogleTrendsMapper
-> = {
+export const GOOGLE_TRENDS_MAPPER: Record<GoogleTrendsEndpoints, GoogleTrendsMapper> = {
   [GoogleTrendsEndpoints.dailyTrends]: {
     path: '/_/TrendsUi/data/batchexecute',
     method: 'POST',
@@ -13,7 +10,7 @@ export const GOOGLE_TRENDS_MAPPER: Record<
     url: `https://${GOOGLE_TRENDS_BASE_URL}/_/TrendsUi/data/batchexecute`,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-    }
+    },
   },
   [GoogleTrendsEndpoints.autocomplete]: {
     path: '/trends/api/autocomplete',
@@ -21,21 +18,21 @@ export const GOOGLE_TRENDS_MAPPER: Record<
     host: GOOGLE_TRENDS_BASE_URL,
     url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/autocomplete`,
     headers: {
-      'accept': 'application/json, text/plain, */*'
-    }
+      accept: 'application/json, text/plain, */*',
+    },
   },
   [GoogleTrendsEndpoints.explore]: {
     path: '/trends/api/explore',
     method: 'GET',
     host: GOOGLE_TRENDS_BASE_URL,
     url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/explore`,
-    headers: {}
+    headers: {},
   },
   [GoogleTrendsEndpoints.interestByRegion]: {
     path: '/trends/api/widgetdata/comparedgeo',
     method: 'GET',
     host: GOOGLE_TRENDS_BASE_URL,
     url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/widgetdata/comparedgeo`,
-    headers: {}
-  }
+    headers: {},
+  },
 };
