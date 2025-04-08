@@ -1,7 +1,7 @@
 {
-  "name": "trends-js",
-  "version": "0.0.0-beta.1",
-  "description": "trends-js",
+  "name": "@shaivpidadi/trends-js",
+  "version": "0.0.0-beta.2",
+  "description": "Google Trends API for Node.js",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -17,7 +17,8 @@
     "postversion": "git push && git push --tags"
   },
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/Shaivpidadi/trends-js.git"
   },
   "keywords": [
     "boilerplate",
