@@ -168,7 +168,7 @@ export class GoogleTrendsApi {
       return `${yyyy}-${mm}-${dd}T${hh}\\:${min}\\:${ss}`;
     };
     
-    const getDateRangeParam = (date: any) => {
+    const getDateRangeParam = (date: Date) => {
       const yesterday = new Date(date);
       yesterday.setDate(date.getDate() - 1);
     

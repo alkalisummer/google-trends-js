@@ -39,8 +39,7 @@ export const request = async (url: string, options: {
     requestOptions.headers = { 'cookie': cookieVal };
   }
 
-  console.log({requestOptions})
-  try {
+
     const response = await new Promise<string>((resolve, reject) => {
       const req = https.request(requestOptions, (res) => {
         let chunk = '';
@@ -79,8 +78,4 @@ export const request = async (url: string, options: {
     return {
       text: () => Promise.resolve(response)
     } as Response;
-
-  } catch (error) {
-    throw error;
-  }
 };
