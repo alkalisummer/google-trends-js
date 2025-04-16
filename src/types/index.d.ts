@@ -67,11 +67,14 @@ export type ExploreResponse = {
 };
 
 export interface InterestByRegionOptions {
-  keyword: string;
-  geo?: string;
-  time?: string;
+  keyword: string | string[];
+  startTime?: Date;
+  endTime?: Date;
+  geo?: string | string[];
   resolution?: 'COUNTRY' | 'REGION' | 'CITY' | 'DMA';
   hl?: string;
+  timezone?: number;
+  category?: number;
 }
 
 export interface InterestByRegionData {
@@ -81,6 +84,10 @@ export interface InterestByRegionData {
   formattedValue: string[];
   maxValueIndex: number;
   hasData: boolean[];
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export interface InterestByRegionResponse {

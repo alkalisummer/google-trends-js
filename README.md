@@ -105,11 +105,14 @@ Get interest data by region:
 
 ```typescript
 const result = await GoogleTrendsApi.interestByRegion({ 
-  keyword: 'Stock Market',
-  geo: 'US',           // Default: 'US'
-  time: 'today 12-m',  // Default: 'today 12-m'
-  resolution: 'REGION', // Default: 'REGION'
-  hl: 'en-US'         // Default: 'en-US'
+  keyword: 'Stock Market',           // Required - string or string[]
+  startTime: new Date('2024-01-01'), // Optional - defaults to 2004-01-01
+  endTime: new Date(),               // Optional - defaults to current date
+  geo: 'US',                         // Optional - string or string[] - defaults to 'US'
+  resolution: 'REGION',              // Optional - 'COUNTRY' | 'REGION' | 'CITY' | 'DMA'
+  hl: 'en-US',                      // Optional - defaults to 'en-US'
+  timezone: -240,                   // Optional - defaults to local timezone
+  category: 0                       // Optional - defaults to 0
 });
 
 // Result structure:
@@ -121,10 +124,26 @@ const result = await GoogleTrendsApi.interestByRegion({
 //       value: number[],
 //       formattedValue: string[],
 //       maxValueIndex: number,
-//       hasData: boolean[]
+//       hasData: boolean[],
+//       coordinates?: {
+//         lat: number,
+//         lng: number
+//       }
 //     }>
 //   }
 // }
+```
+
+Example with multiple keywords and regions:
+
+```typescript
+const result = await GoogleTrendsApi.interestByRegion({ 
+  keyword: ['wine', 'peanuts'],
+  geo: ['US-CA', 'US-VA'],
+  startTime: new Date('2024-01-01'),
+  endTime: new Date(),
+  resolution: 'CITY'
+});
 ```
 
 ## API Reference
@@ -164,11 +183,14 @@ interface ExploreOptions {
 
 ```typescript
 interface InterestByRegionOptions {
-  keyword: string;
-  geo?: string;           // Default: 'US'
-  time?: string;          // Default: 'today 12-m'
-  resolution?: 'COUNTRY' | 'REGION' | 'CITY' | 'DMA'; // Default: 'REGION'
-  hl?: string;           // Default: 'en-US'
+  keyword: string | string[];        // Required - search term(s)
+  startTime?: Date;                  // Optional - start date
+  endTime?: Date;                    // Optional - end date
+  geo?: string | string[];           // Optional - geocode(s)
+  resolution?: 'COUNTRY' | 'REGION' | 'CITY' | 'DMA'; // Optional
+  hl?: string;                       // Optional - language code
+  timezone?: number;                 // Optional - timezone offset
+  category?: number;                 // Optional - category number
 }
 ```
 
@@ -176,26 +198,4 @@ interface InterestByRegionOptions {
 
 ### Building
 
-```bash
-npm run build
 ```
-
-### Testing
-
-```bash
-npm test
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-## License
-
-MIT
-
-## Author
-
-Shaishav Pidadi

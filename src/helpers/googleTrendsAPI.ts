@@ -141,16 +141,53 @@ export class GoogleTrendsApi {
     }
   }
 
+  // 
   async interestByRegion({
     keyword,
+    startTime = new Date('2004-01-01'),
+    endTime = new Date(),
     geo = 'US',
-    time = 'today 12-m',
     resolution = 'REGION',
     hl = 'en-US',
+    timezone = new Date().getTimezoneOffset(),
+    category = 0
   }: InterestByRegionOptions): Promise<InterestByRegionResponse> {
-    // First get the widget token from explore
-    const exploreResponse = await this.explore({ keyword, geo, time, hl });
-    const widget = exploreResponse.widgets.find((w) => w.id === 'GEO_MAP_0');
+    const formatDate = (date: Date) => {
+      return date.toISOString().split('T')[0];
+    };
+
+    const formatTrendsDate = (date: Date): string => {
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const yyyy = date.getFullYear();
+      const mm = pad(date.getMonth() + 1);
+      const dd = pad(date.getDate());
+      const hh = pad(date.getHours());
+      const min = pad(date.getMinutes());
+      const ss = pad(date.getSeconds());
+    
+      return `${yyyy}-${mm}-${dd}T${hh}\\:${min}\\:${ss}`;
+    };
+    
+    const getDateRangeParam = (date: any) => {
+      const yesterday = new Date(date);
+      yesterday.setDate(date.getDate() - 1);
+    
+      const formattedStart = formatTrendsDate(yesterday);
+      const formattedEnd = formatTrendsDate(date);
+    
+      return `${formattedStart} ${formattedEnd}`;
+    };
+
+    
+    const exploreResponse = await this.explore({ 
+      keyword: Array.isArray(keyword) ? keyword[0] : keyword,
+      geo: Array.isArray(geo) ? geo[0] : geo,
+      time: `${getDateRangeParam(startTime)} ${getDateRangeParam(endTime)}`,
+      category,
+      hl
+    });
+    
+    const widget = exploreResponse.widgets.find(w => w.id === 'GEO_MAP');
 
     if (!widget) {
       return { default: { geoMapData: [] } };
@@ -160,35 +197,33 @@ export class GoogleTrendsApi {
       ...GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.interestByRegion],
       qs: {
         hl,
-        tz: '240',
+        tz: timezone.toString(),
         req: JSON.stringify({
-          geo: { country: geo },
-          comparisonItem: [
-            {
-              time,
-              complexKeywordsRestriction: {
-                keyword: [
-                  {
-                    type: 'BROAD',
-                    value: keyword,
-                  },
-                ],
-              },
-            },
-          ],
+          geo: {
+            country: Array.isArray(geo) ? geo[0] : geo
+          },
+          comparisonItem: [{
+            time: `${formatDate(startTime)} ${formatDate(endTime)}`,
+            complexKeywordsRestriction: {
+              keyword: [{
+                type: 'BROAD', //'ENTITY',
+                value: Array.isArray(keyword) ? keyword[0] : keyword
+              }]
+            }
+          }],
           resolution,
           locale: hl,
           requestOptions: {
             property: '',
-            backend: 'IZG',
-            category: 0,
+            backend: 'CM', //'IZG',
+            category
           },
           userConfig: {
-            userType: 'USER_TYPE_SCRAPER',
-          },
+            userType: 'USER_TYPE_LEGIT_USER'
+          }
         }),
-        token: widget.token,
-      },
+        token: widget.token
+      }
     };
 
     try {
@@ -198,7 +233,6 @@ export class GoogleTrendsApi {
       const data = JSON.parse(text.slice(5));
       return data;
     } catch (error) {
-      console.error('Interest by region request failed:', error);
       return { default: { geoMapData: [] } };
     }
   }

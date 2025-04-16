@@ -23,7 +23,7 @@ export const GOOGLE_TRENDS_MAPPER: Record<GoogleTrendsEndpoints, GoogleTrendsMap
   },
   [GoogleTrendsEndpoints.explore]: {
     path: '/trends/api/explore',
-    method: 'GET',
+    method: 'POST',
     host: GOOGLE_TRENDS_BASE_URL,
     url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/explore`,
     headers: {},
