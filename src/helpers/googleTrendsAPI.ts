@@ -46,6 +46,7 @@ export class GoogleTrendsApi {
       body: new URLSearchParams({
         'f.req': `[[["i0OFE","[null,null,\\"${geo}\\",0,\\"${lang}\\",24,1]",null,"generic"]]]`,
       }).toString(),
+      contentType: 'form' as const
     };
 
     try {
@@ -78,6 +79,7 @@ export class GoogleTrendsApi {
       body: new URLSearchParams({
         'f.req': `[[["i0OFE","[null,null,\\"${geo}\\",0,\\"en\\",${trendingHours},1]",null,"generic"]]]`,
       }).toString(),
+      contentType: 'form' as const
     };
 
     try {
