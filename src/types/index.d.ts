@@ -27,10 +27,40 @@ export type DailyTrendingTopicsOptions = {
   lang?: string;
 };
 
-export type DailyTrendingTopics = {
-  allTrendingStories: unknown[];
-  summary: string[];
-};
+export interface TrendingStory {
+  title: string;
+  traffic: string;
+  image?: {
+    newsUrl: string;
+    source: string;
+    imageUrl: string;
+  };
+  articles: Array<{
+    title: string;
+    url: string;
+    source: string;
+    time: string;
+    snippet: string;
+  }>;
+  shareUrl: string;
+}
+
+export interface TrendingTopic {
+  title: string;
+  traffic: string;
+  articles: Array<{
+    title: string;
+    url: string;
+    source: string;
+    time: string;
+    snippet: string;
+  }>;
+}
+
+export interface DailyTrendingTopics {
+  allTrendingStories: TrendingStory[];
+  summary: TrendingTopic[];
+}
 
 // Real Time Trends
 
@@ -95,3 +125,17 @@ export interface InterestByRegionResponse {
     geoMapData: InterestByRegionData[];
   };
 }
+
+export interface GoogleTrendsError extends Error {
+  code: string;
+  statusCode?: number;
+  details?: unknown;
+}
+
+export type GoogleTrendsResponse<T> = {
+  data: T;
+  error?: never;
+} | {
+  data?: never;
+  error: GoogleTrendsError;
+};

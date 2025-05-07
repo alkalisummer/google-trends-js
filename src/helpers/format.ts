@@ -1,4 +1,5 @@
-import { DailyTrendingTopics } from '../types';
+import { DailyTrendingTopics, TrendingStory, TrendingTopic } from '../types';
+import { ParseError } from '../errors/GoogleTrendsError';
 
 // For future refrence and update: from google trends page rpc call response,
 // 0	"twitter down"	The main trending search term.
@@ -21,37 +22,65 @@ export const extractJsonFromResponse = (text: string): DailyTrendingTopics | nul
     const parsedResponse = JSON.parse(cleanedText);
 
     if (!Array.isArray(parsedResponse) || parsedResponse.length === 0) {
-      return null;
+      throw new ParseError('Invalid response format: empty array');
     }
     const nestedJsonString = parsedResponse[0][2];
 
     if (!nestedJsonString) {
-      return null;
+      throw new ParseError('Invalid response format: missing nested JSON');
     }
     const data = JSON.parse(nestedJsonString);
 
     if (!data || !Array.isArray(data) || data.length < 2) {
-      return null;
+      throw new ParseError('Invalid response format: missing data array');
     }
 
     return updateResponseObject(data[1]);
   } catch (e: unknown) {
-    console.error('Failed to parse response:', e);
-    return null;
+    if (e instanceof ParseError) {
+      throw e;
+    }
+    throw new ParseError('Failed to parse response');
   }
 };
 
-const updateResponseObject = (data: unknown[]): DailyTrendingTopics | null => {
+const updateResponseObject = (data: unknown[]): DailyTrendingTopics => {
   if (!Array.isArray(data)) {
-    return null;
+    throw new ParseError('Invalid data format: expected array');
   }
 
-  const allTrendingStories = data;
-  const summary: string[] = [];
+  const allTrendingStories: TrendingStory[] = [];
+  const summary: TrendingTopic[] = [];
 
   data.forEach((item: unknown) => {
-    if (Array.isArray(item) && typeof item[0] === 'string') {
-      summary.push(item[0]); // First element is usually the trending keyword
+    if (Array.isArray(item)) {
+      const story: TrendingStory = {
+        title: String(item[0] || ''),
+        traffic: String(item[6] || '0'),
+        articles: Array.isArray(item[9]) ? item[9].map((article: any) => ({
+          title: String(article[0] || ''),
+          url: String(article[1] || ''),
+          source: String(article[2] || ''),
+          time: String(article[3] || ''),
+          snippet: String(article[4] || '')
+        })) : [],
+        shareUrl: String(item[12] || '')
+      };
+
+      if (item[1]) {
+        story.image = {
+          newsUrl: String(item[1][0] || ''),
+          source: String(item[1][1] || ''),
+          imageUrl: String(item[1][2] || '')
+        };
+      }
+
+      allTrendingStories.push(story);
+      summary.push({
+        title: story.title,
+        traffic: story.traffic,
+        articles: story.articles
+      });
     }
   });
 

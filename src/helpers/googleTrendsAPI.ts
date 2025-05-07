@@ -7,15 +7,29 @@ import {
   ExploreResponse,
   InterestByRegionOptions,
   InterestByRegionResponse,
+  GoogleTrendsResponse,
 } from '../types/index';
 import { request } from './request';
 import { extractJsonFromResponse } from './format';
 import { GOOGLE_TRENDS_MAPPER } from '../constants';
+import {
+  RateLimitError,
+  InvalidRequestError,
+  NetworkError,
+  ParseError,
+  UnknownError,
+} from '../errors/GoogleTrendsError';
 
 export class GoogleTrendsApi {
-  async autocomplete(keyword: string, hl = 'en-US'): Promise<string[]> {
+  /**
+   * Get autocomplete suggestions for a keyword
+   * @param keyword - The keyword to get suggestions for
+   * @param hl - Language code (default: 'en-US')
+   * @returns Promise with array of suggestion strings
+   */
+  async autocomplete(keyword: string, hl = 'en-US'): Promise<GoogleTrendsResponse<string[]>> {
     if (!keyword) {
-      return [];
+      return { data: [] };
     }
 
     const options = {
@@ -31,14 +45,21 @@ export class GoogleTrendsApi {
       const text = await response.text();
       // Remove the first 5 characters (JSONP wrapper) and parse
       const data = JSON.parse(text.slice(5));
-      return data.default.topics.map((topic: { title: string }) => topic.title);
+      return { data: data.default.topics.map((topic: { title: string }) => topic.title) };
     } catch (error) {
-      console.error('Autocomplete request failed:', error);
-      return [];
+      if (error instanceof Error) {
+        return { error: new NetworkError(error.message) };
+      }
+      return { error: new UnknownError() };
     }
   }
 
-  async dailyTrends({ geo = 'US', lang = 'en' }: DailyTrendingTopicsOptions): Promise<DailyTrendingTopics> {
+  /**
+   * Get daily trending topics
+   * @param options - Options for daily trends request
+   * @returns Promise with trending topics data
+   */
+  async dailyTrends({ geo = 'US', lang = 'en' }: DailyTrendingTopicsOptions): Promise<GoogleTrendsResponse<DailyTrendingTopics>> {
     const defaultOptions = GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.dailyTrends];
 
     const options = {
@@ -55,23 +76,24 @@ export class GoogleTrendsApi {
       const trendingTopics = extractJsonFromResponse(text);
 
       if (!trendingTopics) {
-        return {
-          allTrendingStories: [],
-          summary: [],
-        };
+        return { error: new ParseError() };
       }
 
-      return trendingTopics;
+      return { data: trendingTopics };
     } catch (error) {
-      console.error(error);
-      return {
-        allTrendingStories: [],
-        summary: [],
-      };
+      if (error instanceof Error) {
+        return { error: new NetworkError(error.message) };
+      }
+      return { error: new UnknownError() };
     }
   }
 
-  async realTimeTrends({ geo = 'US', trendingHours = 4 }: RealTimeTrendsOptions): Promise<DailyTrendingTopics> {
+  /**
+   * Get real-time trending topics
+   * @param options - Options for real-time trends request
+   * @returns Promise with trending topics data
+   */
+  async realTimeTrends({ geo = 'US', trendingHours = 4 }: RealTimeTrendsOptions): Promise<GoogleTrendsResponse<DailyTrendingTopics>> {
     const defaultOptions = GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.dailyTrends];
 
     const options = {
@@ -88,26 +110,22 @@ export class GoogleTrendsApi {
       const trendingTopics = extractJsonFromResponse(text);
 
       if (!trendingTopics) {
-        return {
-          allTrendingStories: [],
-          summary: [],
-        };
+        return { error: new ParseError() };
       }
 
-      return trendingTopics;
+      return { data: trendingTopics };
     } catch (error) {
-      console.error(error);
-      return {
-        allTrendingStories: [],
-        summary: [],
-      };
+      if (error instanceof Error) {
+        return { error: new NetworkError(error.message) };
+      }
+      return { error: new UnknownError() };
     }
   }
 
   async explore({
     keyword,
     geo = 'US',
-    time = 'today 12-m',
+    time = 'now 1-d',
     category = 0,
     property = '',
     hl = 'en-US',
@@ -129,6 +147,7 @@ export class GoogleTrendsApi {
           property,
         }),
       },
+      contentType: 'form' as const
     };
 
     try {
