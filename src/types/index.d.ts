@@ -57,6 +57,43 @@ export interface TrendingTopic {
   }>;
 }
 
+export interface TrendingKeyword {
+  title: string;
+  traffic: string;
+  trafficGrowthRate: string;
+  activeTime: string;
+  relatedKeywords: string[];
+  articleKeys: ArticleKey[];
+}
+
+export type TrendingArticlesOptions = {
+  articleKeys: ArticleKey[];
+  articleCount: number;
+};
+
+export type ArticleKey = [number, string, string];
+
+export interface Article {
+  title: string;
+  link: string;
+  mediaCompany: string;
+  pressDate: number[];
+  image: string;
+}
+
+export interface InterestOverTimeOptions {
+  keyword: string;
+  geo: string;
+}
+
+export interface Interest {
+  keyword: string;
+  dates: string[];
+  values: number[];
+}
+
+export type InterestTrend = [number, number, number[]];
+
 export interface DailyTrendingTopics {
   allTrendingStories: TrendingStory[];
   summary: TrendingTopic[];
@@ -77,7 +114,7 @@ export type ExploreOptions = {
   time?: string;
   category?: number;
   property?: string;
-  hl?: string;
+  lang?: string;
 };
 
 export type ExploreResponse = {
@@ -102,7 +139,7 @@ export interface InterestByRegionOptions {
   endTime?: Date;
   geo?: string | string[];
   resolution?: 'COUNTRY' | 'REGION' | 'CITY' | 'DMA';
-  hl?: string;
+  lang?: string;
   timezone?: number;
   category?: number;
 }
@@ -132,10 +169,14 @@ export interface GoogleTrendsError extends Error {
   details?: unknown;
 }
 
-export type GoogleTrendsResponse<T> = {
-  data: T;
-  error?: never;
-} | {
-  data?: never;
-  error: GoogleTrendsError;
-};
+export type GoogleTrendsResponse<T> =
+  | {
+      data: T;
+      error?: never;
+    }
+  | {
+      data?: never;
+      error: GoogleTrendsError;
+    };
+
+export type GoogleTrendsType = 'trends' | 'articles' | 'interest';

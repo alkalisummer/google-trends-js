@@ -1,4 +1,4 @@
-import { DailyTrendingTopics, TrendingStory, TrendingTopic } from '../types';
+import { TrendingKeyword, GoogleTrendsType, Article, Interest, InterestTrend } from '../types';
 import { ParseError } from '../errors/GoogleTrendsError';
 
 // For future refrence and update: from google trends page rpc call response,
@@ -16,7 +16,10 @@ import { ParseError } from '../errors/GoogleTrendsError';
 // 11	[[3606769742, "en", "US"], [3596035008, "en", "US"]]	User demographics or trending sources, with numerical IDs, language ("en" for English), and country ("US" for United States).
 // 12	"twitter down"	The original trending keyword (sometimes a duplicate of index 0).
 
-export const extractJsonFromResponse = (text: string): DailyTrendingTopics | null => {
+export const extractJsonFromResponse = (
+  text: string,
+  type: GoogleTrendsType,
+): TrendingKeyword[] | Article[] | Interest | null => {
   const cleanedText = text.replace(/^\)\]\}'/, '').trim();
   try {
     const parsedResponse = JSON.parse(cleanedText);
@@ -35,7 +38,14 @@ export const extractJsonFromResponse = (text: string): DailyTrendingTopics | nul
       throw new ParseError('Invalid response format: missing data array');
     }
 
-    return updateResponseObject(data[1]);
+    switch (type) {
+      case 'trends':
+        return updateTrendsResponseObject(data[1]);
+      case 'articles':
+        return updateArticlesResponseObject(data[0]);
+      case 'interest':
+        return updateInterestResponseObject(data[0]);
+    }
   } catch (e: unknown) {
     if (e instanceof ParseError) {
       throw e;
@@ -44,45 +54,84 @@ export const extractJsonFromResponse = (text: string): DailyTrendingTopics | nul
   }
 };
 
-const updateResponseObject = (data: unknown[]): DailyTrendingTopics => {
+const updateTrendsResponseObject = (data: unknown[]): TrendingKeyword[] => {
   if (!Array.isArray(data)) {
     throw new ParseError('Invalid data format: expected array');
   }
 
-  const allTrendingStories: TrendingStory[] = [];
-  const summary: TrendingTopic[] = [];
+  const trends: TrendingKeyword[] = [];
 
-  data.forEach((item: unknown) => {
-    if (Array.isArray(item)) {
-      const story: TrendingStory = {
-        title: String(item[0] || ''),
-        traffic: String(item[6] || '0'),
-        articles: Array.isArray(item[9]) ? item[9].map((article: any) => ({
-          title: String(article[0] || ''),
-          url: String(article[1] || ''),
-          source: String(article[2] || ''),
-          time: String(article[3] || ''),
-          snippet: String(article[4] || '')
-        })) : [],
-        shareUrl: String(item[12] || '')
-      };
+  data.forEach((item) => {
+    if (!Array.isArray(item) || item[4] !== null) return;
 
-      if (item[1]) {
-        story.image = {
-          newsUrl: String(item[1][0] || ''),
-          source: String(item[1][1] || ''),
-          imageUrl: String(item[1][2] || '')
-        };
-      }
-
-      allTrendingStories.push(story);
-      summary.push({
-        title: story.title,
-        traffic: story.traffic,
-        articles: story.articles
-      });
-    }
+    const trendsInfo = {
+      title: String(item[0] || ''),
+      traffic: String(item[6] || '0'),
+      trafficGrowthRate: String(item[8] || '0'),
+      activeTime: String(item[3] || '0'),
+      relatedKeywords: item[9] || [],
+      articleKeys: item[11] || [],
+    };
+    trends.push(trendsInfo);
   });
 
-  return { allTrendingStories, summary };
+  return trends;
+};
+
+const updateArticlesResponseObject = (data: unknown[]): Article[] => {
+  if (!Array.isArray(data)) {
+    throw new ParseError('Invalid data format: expected array');
+  }
+
+  const articles: Article[] = [];
+  data.forEach((item) => {
+    if (!Array.isArray(item)) return;
+
+    const articleInfo = {
+      title: String(item[0] || ''),
+      link: String(item[1] || ''),
+      mediaCompany: String(item[2] || ''),
+      pressDate: item[3] || 0,
+      image: String(item[4] || ''),
+    };
+    articles.push(articleInfo);
+  });
+  return articles;
+};
+
+const updateInterestResponseObject = (data: unknown[][]): Interest => {
+  if (!Array.isArray(data)) {
+    throw new ParseError('Invalid data format: expected array');
+  }
+
+  const keyword = String(data[0][0] || '');
+  const dates: string[] = [];
+  const values: number[] = [];
+
+  const trends = data[0][4] as InterestTrend[];
+
+  trends.forEach((trend) => {
+    const value = trend[0];
+    const timestamps = trend[2];
+
+    const timestamp = timestamps[0] * 1000;
+    const dateObj = new Date(timestamp);
+
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+
+    const formatted = `${year}-${month}-${day} ${hours}:${minutes}`;
+
+    values.push(value);
+    dates.push(formatted);
+  });
+
+  return {
+    keyword,
+    dates,
+    values,
+  };
 };
