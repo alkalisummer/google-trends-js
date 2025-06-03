@@ -2,6 +2,8 @@
 
 A TypeScript library for interacting with the Google Trends API. This package provides a simple and type-safe way to access Google Trends data programmatically.
 
+This API was developed based on @shaivpidadi/trends-js with some added and modified features.
+
 ## Installation
 
 ```bash
@@ -12,9 +14,11 @@ npm install @alkalisummer/trends-js
 
 - Get daily trending topics
 - Get real-time trending topics
+- Get articles releated trening topics
 - Get autocomplete suggestions
 - Explore trends data
 - Get interest by region data
+- Get interest change timeline by trending topics
 - TypeScript support
 - Promise-based API
 
@@ -38,8 +42,42 @@ const result = await GoogleTrendsApi.dailyTrends({
 
 // Result structure:
 // {
-//   allTrendingStories: Array<...>,
-//   summary: string[]
+//   data?: TrendingKeyword[],
+//   error?: GoogleTrendsError
+// }
+```
+
+### Trending Articles
+
+Get trending articles for specific article keys:
+
+```typescript
+const result = await GoogleTrendsApi.trendingArticles({
+  articleKeys: [[1, 'articleId', 'articleTitle']], // Array of article keys
+  articleCount: 5, // Number of articles to get
+});
+
+// Result structure:
+// {
+//   data?: Article[],
+//   error?: GoogleTrendsError
+// }
+```
+
+### Interest Over Time
+
+Get interest over time data for a specific keyword:
+
+```typescript
+const result = await GoogleTrendsApi.interestOverTime({
+  keyword: 'bitcoin',
+  geo: 'US', // Default: 'US'
+});
+
+// Result structure:
+// {
+//   data?: Interest,
+//   error?: GoogleTrendsError
 // }
 ```
 
@@ -189,6 +227,26 @@ interface InterestByRegionOptions {
   hl?: string; // Optional - language code
   timezone?: number; // Optional - timezone offset
   category?: number; // Optional - category number
+}
+```
+
+### TrendingArticlesOptions
+
+```typescript
+interface TrendingArticlesOptions {
+  articleKeys: ArticleKey[]; // Required - array of article keys
+  articleCount: number; // Required - number of articles to get
+}
+
+type ArticleKey = [number, string, string]; // [index, articleId, articleTitle]
+```
+
+### InterestOverTimeOptions
+
+```typescript
+interface InterestOverTimeOptions {
+  keyword: string; // Required - search term
+  geo?: string; // Optional - geocode (default: 'US')
 }
 ```
 
