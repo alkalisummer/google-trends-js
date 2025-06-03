@@ -34,7 +34,7 @@ export const extractJsonFromResponse = (
     }
     const data = JSON.parse(nestedJsonString);
 
-    if (!data || !Array.isArray(data) || data.length < 2) {
+    if (!data || !Array.isArray(data)) {
       throw new ParseError('Invalid response format: missing data array');
     }
 
