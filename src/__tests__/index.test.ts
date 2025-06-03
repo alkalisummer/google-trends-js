@@ -95,6 +95,9 @@ describe('GoogleTrendsApi', () => {
       }
       expect(articleKey).toBeDefined();
       const result = await GoogleTrendsApi.trendingArticles({ articleKeys: [articleKey], articleCount: 1 });
+      if (result.error) {
+        throw new Error(`API error: ${result.error.message}`);
+      }
       expect(Array.isArray(result.data)).toBe(true);
     });
   });
@@ -102,6 +105,9 @@ describe('GoogleTrendsApi', () => {
   describe('interestOverTime', () => {
     it('should return interest over time for a keyword', async () => {
       const result = await GoogleTrendsApi.interestOverTime({ keyword: 'bitcoin', geo: 'US' });
+      if (result.error) {
+        throw new Error(`API error: ${result.error.message}`);
+      }
       expect(result.data).toBeDefined();
       expect(typeof result.data).toBe('object');
     });
