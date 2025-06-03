@@ -42,9 +42,17 @@ const result = await GoogleTrendsApi.dailyTrends({
 
 // Result structure:
 // {
-//   data?: TrendingKeyword[],
+//   data?: Array<{
+//     keyword: string;
+//     traffic: string;
+//     trafficGrowthRate: string;
+//     activeTime: string;
+//     relatedKeywords: string[];
+//     articleKeys: ArticleKey[];
+//   }>,
 //   error?: GoogleTrendsError
 // }
+//
 ```
 
 ### Trending Articles
@@ -59,7 +67,13 @@ const result = await GoogleTrendsApi.trendingArticles({
 
 // Result structure:
 // {
-//   data?: Article[],
+//   data?: Array<{
+//     title: string;
+//     link: string;
+//     mediaCompany: string;
+//     pressDate: number[];
+//     image: string;
+//   }>,
 //   error?: GoogleTrendsError
 // }
 ```
@@ -76,7 +90,11 @@ const result = await GoogleTrendsApi.interestOverTime({
 
 // Result structure:
 // {
-//   data?: Interest,
+//   data?: {
+//     keyword: string;
+//     dates: string[];
+//     values: number[];
+//   },
 //   error?: GoogleTrendsError
 // }
 ```

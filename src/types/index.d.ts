@@ -45,20 +45,8 @@ export interface TrendingStory {
   shareUrl: string;
 }
 
-export interface TrendingTopic {
-  title: string;
-  traffic: string;
-  articles: Array<{
-    title: string;
-    url: string;
-    source: string;
-    time: string;
-    snippet: string;
-  }>;
-}
-
 export interface TrendingKeyword {
-  title: string;
+  keyword: string;
   traffic: string;
   trafficGrowthRate: string;
   activeTime: string;

@@ -65,7 +65,7 @@ const updateTrendsResponseObject = (data: unknown[]): TrendingKeyword[] => {
     if (!Array.isArray(item) || item[4] !== null) return;
 
     const trendsInfo = {
-      title: String(item[0] || ''),
+      keyword: String(item[0] || ''),
       traffic: String(item[6] || '0'),
       trafficGrowthRate: String(item[8] || '0'),
       activeTime: String(item[3] || '0'),
