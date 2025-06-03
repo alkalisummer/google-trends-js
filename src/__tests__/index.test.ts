@@ -9,7 +9,7 @@ describe('GoogleTrendsApi', () => {
       const result = await GoogleTrendsApi.dailyTrends({ geo: 'US' });
       expect(Array.isArray(result.data)).toBe(true);
       expect(result.data?.length).toBeGreaterThan(0);
-      expect(result.data?.[0]).toHaveProperty('title');
+      expect(result.data?.[0]).toHaveProperty('keyword');
     });
     it('should return trending topics for different geo locations', async () => {
       const locations = ['US', 'GB', 'JP', 'IN', 'BR', 'DE', 'FR', 'CA', 'AU', 'RU'];
