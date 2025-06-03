@@ -148,6 +148,7 @@ export class GoogleTrendsApi {
       body: new URLSearchParams({
         'f.req': `[[["w4opAf","[[${articleKeysStr}],${articleCount}]",null,"generic"]]]`,
       }).toString(),
+      contentType: 'form' as const,
     };
 
     try {
@@ -181,6 +182,7 @@ export class GoogleTrendsApi {
       body: new URLSearchParams({
         'f.req': `[[["g4kJzf","[[[\\"${geo}\\",\\"${keyword}\\",3,null,3]]]",null,"generic"]]]`,
       }).toString(),
+      contentType: 'form' as const,
     };
 
     try {

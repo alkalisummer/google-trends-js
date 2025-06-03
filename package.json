@@ -1,6 +1,6 @@
 {
-  "name": "@shaivpidadi/trends-js",
-  "version": "0.0.0-beta.6",
+  "name": "@alkalisummer/trends-js",
+  "version": "0.0.1",
   "description": "Google Trends API for Node.js",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Shaivpidadi/trends-js.git"
+    "url": "git+https://github.com/alkalisummer/trends-js.git"
   },
   "keywords": [
     "boilerplate",
@@ -26,7 +26,7 @@
     "npm",
     "module"
   ],
-  "author": "Shaishav Pidadi",
+  "author": "alkalisummer",
   "private": false,
   "publishConfig": {
     "access": "public"

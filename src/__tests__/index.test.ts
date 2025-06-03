@@ -1,3 +1,5 @@
+jest.setTimeout(20000);
+
 import GoogleTrendsApi from '../index';
 import { NetworkError } from '../errors/GoogleTrendsError';
 
