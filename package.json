@@ -1,6 +1,6 @@
 {
   "name": "@alkalisummer/trends-js",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Google Trends API for Node.js",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -21,7 +21,12 @@
     "url": "git+https://github.com/alkalisummer/trends-js.git"
   },
   "keywords": [
-    "boilerplate",
+    "google trends",
+    "keyword",
+    "google",
+    "trends",
+    "API",
+    "search",
     "typescript",
     "npm",
     "module"
