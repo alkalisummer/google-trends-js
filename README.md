@@ -57,11 +57,13 @@ const result = await GoogleTrendsApi.dailyTrends({
 
 ### Trending Articles
 
-Get trending articles for specific article keys:
+Get trending articles for specific article keys
+
+You can retrieve articleKeys from the articleKeys field in the response returned by the dailyTrends method.
 
 ```typescript
 const result = await GoogleTrendsApi.trendingArticles({
-  articleKeys: [[1, 'articleId', 'articleTitle']], // Array of article keys
+  articleKeys: [[1, lang, geo]], // Array of article keys
   articleCount: 5, // Number of articles to get
 });
 
@@ -256,7 +258,7 @@ interface TrendingArticlesOptions {
   articleCount: number; // Required - number of articles to get
 }
 
-type ArticleKey = [number, string, string]; // [index, articleId, articleTitle]
+type ArticleKey = [number, string, string]; // [index, lang, geo]
 ```
 
 ### InterestOverTimeOptions
