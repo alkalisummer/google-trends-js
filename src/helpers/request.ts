@@ -1,14 +1,15 @@
 import https from 'https';
-import querystring from 'querystring';
 
 let cookieVal: string | undefined;
 
 function rereq(options: https.RequestOptions, body?: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
-      let chunk = '';
-      res.on('data', (data) => { chunk += data; });
-      res.on('end', () => resolve(chunk));
+      const chunks: Buffer[] = [];
+      res.on('data', (data) => {
+        chunks.push(data);
+      });
+      res.on('end', () => resolve(Buffer.concat(chunks).toString()));
     });
 
     req.on('error', reject);
@@ -25,7 +26,7 @@ export const request = async (
     body?: string | Record<string, any>;
     headers?: Record<string, string>;
     contentType?: 'json' | 'form';
-  }
+  },
 ): Promise<{ text: () => Promise<string> }> => {
   const parsedUrl = new URL(url);
   const method = options.method || 'POST';
@@ -37,7 +38,7 @@ export const request = async (
   if (typeof options.body === 'string') {
     bodyString = options.body;
   } else if (contentType === 'form') {
-    bodyString = querystring.stringify(options.body || {});
+    bodyString = new URLSearchParams((options.body as Record<string, string>) || {}).toString();
   } else if (options.body) {
     bodyString = JSON.stringify(options.body);
   }
@@ -45,7 +46,9 @@ export const request = async (
   const requestOptions: https.RequestOptions = {
     hostname: parsedUrl.hostname,
     port: parsedUrl.port || 443,
-    path: `${parsedUrl.pathname}${options.qs ? '?' + querystring.stringify(options.qs) : ''}`,
+    path: `${parsedUrl.pathname}${
+      options.qs ? `?${new URLSearchParams(options.qs as Record<string, string>).toString()}` : ''
+    }`,
     method,
     headers: {
       ...(options.headers || {}),
@@ -53,20 +56,24 @@ export const request = async (
         ? { 'Content-Type': 'application/x-www-form-urlencoded' }
         : { 'Content-Type': 'application/json' }),
       ...(bodyString ? { 'Content-Length': Buffer.byteLength(bodyString).toString() } : {}),
-      ...(cookieVal ? { cookie: cookieVal } : {})
-    }
+      ...(cookieVal ? { cookie: cookieVal } : {}),
+    },
   };
 
   const response = await new Promise<string>((resolve, reject) => {
     const req = https.request(requestOptions, (res) => {
-      let chunk = '';
+      const chunks: Buffer[] = [];
 
-      res.on('data', (data) => { chunk += data; });
+      res.on('data', (data) => {
+        chunks.push(data);
+      });
 
       res.on('end', async () => {
         if (res.statusCode === 429 && res.headers['set-cookie']) {
           cookieVal = res.headers['set-cookie'][0].split(';')[0];
-          requestOptions.headers!['cookie'] = cookieVal;
+          if (requestOptions.headers) {
+            requestOptions.headers['cookie'] = cookieVal;
+          }
           try {
             const retryResponse = await rereq(requestOptions, bodyString);
             resolve(retryResponse);
@@ -74,7 +81,7 @@ export const request = async (
             reject(err);
           }
         } else {
-          resolve(chunk);
+          resolve(Buffer.concat(chunks).toString());
         }
       });
     });
@@ -85,6 +92,6 @@ export const request = async (
   });
 
   return {
-    text: () => Promise.resolve(response)
+    text: () => Promise.resolve(response),
   };
 };
