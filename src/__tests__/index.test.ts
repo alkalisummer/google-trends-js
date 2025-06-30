@@ -20,17 +20,17 @@ describe('GoogleTrendsApi', () => {
     });
     it('should return trending topics for different languages', async () => {
       const languages = [
-        { lang: 'en', geo: 'US' },
-        { lang: 'fr', geo: 'FR' },
-        { lang: 'de', geo: 'DE' },
-        { lang: 'es', geo: 'ES' },
-        { lang: 'ja', geo: 'JP' },
-        { lang: 'pt', geo: 'BR' },
-        { lang: 'it', geo: 'IT' },
-        { lang: 'ru', geo: 'RU' },
+        { hl: 'en', geo: 'US' },
+        { hl: 'fr', geo: 'FR' },
+        { hl: 'de', geo: 'DE' },
+        { hl: 'es', geo: 'ES' },
+        { hl: 'ja', geo: 'JP' },
+        { hl: 'pt', geo: 'BR' },
+        { hl: 'it', geo: 'IT' },
+        { hl: 'ru', geo: 'RU' },
       ];
-      for (const { lang, geo } of languages) {
-        const result = await GoogleTrendsApi.dailyTrends({ geo, lang });
+      for (const { hl, geo } of languages) {
+        const result = await GoogleTrendsApi.dailyTrends({ geo, hl });
         expect(Array.isArray(result.data)).toBe(true);
       }
     });

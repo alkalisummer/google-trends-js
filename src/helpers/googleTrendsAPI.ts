@@ -23,10 +23,10 @@ export class GoogleTrendsApi {
   /**
    * Get autocomplete suggestions for a keyword
    * @param keyword - The keyword to get suggestions for
-   * @param lang - Language code (default: 'en-US')
+   * @param hl - Language code (default: 'en-US')
    * @returns Promise with array of suggestion strings
    */
-  async autocomplete(keyword: string, lang = 'en-US'): Promise<GoogleTrendsResponse<string[]>> {
+  async autocomplete(keyword: string, hl = 'en-US'): Promise<GoogleTrendsResponse<string[]>> {
     if (!keyword) {
       return { data: [] };
     }
@@ -34,7 +34,7 @@ export class GoogleTrendsApi {
     const options = {
       ...GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.autocomplete],
       qs: {
-        lang,
+        hl,
         tz: '240',
       },
     };
@@ -56,19 +56,19 @@ export class GoogleTrendsApi {
   /**
    * Get daily trending topics
    * @param geo - Country code (default: 'US')
-   * @param lang - Language code (default: 'en')
+   * @param hl - Language code (default: 'en')
    * @returns Promise with trending topics data
    */
   async dailyTrends({
     geo = 'US',
-    lang = 'en',
+    hl = 'en',
   }: DailyTrendingTopicsOptions): Promise<GoogleTrendsResponse<TrendingKeyword[]>> {
     const defaultOptions = GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.dailyTrends];
 
     const options = {
       ...defaultOptions,
       body: new URLSearchParams({
-        'f.req': `[[["i0OFE","[null,null,\\"${geo}\\",0,\\"${lang}\\",24,1]",null,"generic"]]]`,
+        'f.req': `[[["i0OFE","[null,null,\\"${geo}\\",0,\\"${hl}\\",24,1]",null,"generic"]]]`,
       }).toString(),
       contentType: 'form' as const,
     };
@@ -210,7 +210,7 @@ export class GoogleTrendsApi {
    * @param time - Time period for the explore data
    * @param category - Category for the explore data
    * @param property - Property for the explore data
-   * @param lang - Language code (default: 'en-US')
+   * @param hl - Language code (default: 'en-US')
    * @returns Promise with explore data
    */
   async explore({
@@ -219,12 +219,12 @@ export class GoogleTrendsApi {
     time = 'now 1-d',
     category = 0,
     property = '',
-    lang = 'en-US',
+    hl = 'en-US',
   }: ExploreOptions): Promise<ExploreResponse> {
     const options = {
       ...GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.explore],
       qs: {
-        lang,
+        hl,
         tz: '240',
         req: JSON.stringify({
           comparisonItem: [
@@ -260,7 +260,7 @@ export class GoogleTrendsApi {
    * @param endTime - End time for the interest by region
    * @param geo - Country code (default: 'US')
    * @param resolution - Resolution for the interest by region
-   * @param lang - Language code (default: 'en-US')
+   * @param hl - Language code (default: 'en-US')
    * @param timezone - Timezone offset
    * @param category - Category for the interest by region
    * @returns Promise with interest by region data
@@ -271,7 +271,7 @@ export class GoogleTrendsApi {
     endTime = new Date(),
     geo = 'US',
     resolution = 'REGION',
-    lang = 'en-US',
+    hl = 'en-US',
     timezone = new Date().getTimezoneOffset(),
     category = 0,
   }: InterestByRegionOptions): Promise<InterestByRegionResponse> {
@@ -306,7 +306,7 @@ export class GoogleTrendsApi {
       geo: Array.isArray(geo) ? geo[0] : geo,
       time: `${getDateRangeParam(startTime)} ${getDateRangeParam(endTime)}`,
       category,
-      lang,
+      hl,
     });
 
     const widget = exploreResponse.widgets.find((w) => w.id === 'GEO_MAP');
@@ -318,7 +318,7 @@ export class GoogleTrendsApi {
     const options = {
       ...GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.interestByRegion],
       qs: {
-        lang,
+        hl,
         tz: timezone.toString(),
         req: JSON.stringify({
           geo: {
@@ -338,7 +338,7 @@ export class GoogleTrendsApi {
             },
           ],
           resolution,
-          locale: lang,
+          locale: hl,
           requestOptions: {
             property: '',
             backend: 'CM', //'IZG',

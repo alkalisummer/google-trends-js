@@ -37,7 +37,7 @@ Get daily trending topics for a specific region:
 ```typescript
 const result = await GoogleTrendsApi.dailyTrends({
   geo: 'US', // Default: 'US'
-  lang: 'en', // Default: 'en'
+  hl: 'en', // Default: 'en'
 });
 
 // Result structure:
@@ -63,7 +63,7 @@ You can retrieve articleKeys from the articleKeys field in the response returned
 
 ```typescript
 const result = await GoogleTrendsApi.trendingArticles({
-  articleKeys: [[1, lang, geo]], // Array of article keys
+  articleKeys: [[1, hl, geo]], // Array of article keys
   articleCount: 5, // Number of articles to get
 });
 
@@ -209,7 +209,7 @@ const result = await GoogleTrendsApi.interestByRegion({
 ```typescript
 interface DailyTrendsOptions {
   geo?: string; // Default: 'US'
-  lang?: string; // Default: 'en'
+  hl?: string; // Default: 'en'
 }
 ```
 

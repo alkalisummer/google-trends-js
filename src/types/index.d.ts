@@ -24,7 +24,7 @@ export const enum GoogleTrendsTrendingHours {
 
 export type DailyTrendingTopicsOptions = {
   geo?: string;
-  lang?: string;
+  hl?: string;
 };
 
 export interface TrendingStory {
@@ -102,7 +102,7 @@ export type ExploreOptions = {
   time?: string;
   category?: number;
   property?: string;
-  lang?: string;
+  hl?: string;
 };
 
 export type ExploreResponse = {
@@ -127,7 +127,7 @@ export interface InterestByRegionOptions {
   endTime?: Date;
   geo?: string | string[];
   resolution?: 'COUNTRY' | 'REGION' | 'CITY' | 'DMA';
-  lang?: string;
+  hl?: string;
   timezone?: number;
   category?: number;
 }

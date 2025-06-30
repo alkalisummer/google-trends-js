@@ -1,6 +1,6 @@
 {
   "name": "@alkalisummer/google-trends-js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Google Trends API for Node.js",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
