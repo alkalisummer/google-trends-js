@@ -33,6 +33,8 @@ export const GOOGLE_TRENDS_MAPPER: Record<GoogleTrendsEndpoints, GoogleTrendsMap
     method: 'GET',
     host: GOOGLE_TRENDS_BASE_URL,
     url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/widgetdata/comparedgeo`,
-    headers: {},
+    headers: {
+      accept: 'application/json, text/plain, */*',
+    },
   },
 };

@@ -225,7 +225,7 @@ export class GoogleTrendsApi {
       ...GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.explore],
       qs: {
         hl,
-        tz: '240',
+        tz: new Date().getTimezoneOffset().toString(),
         req: JSON.stringify({
           comparisonItem: [
             {
@@ -238,14 +238,18 @@ export class GoogleTrendsApi {
           property,
         }),
       },
-      contentType: 'form' as const,
     };
 
     try {
       const response = await request(options.url, options);
       const text = await response.text();
-      // Remove the first 5 characters (JSONP wrapper) and parse
-      const data = JSON.parse(text.slice(5));
+      let data;
+      if (text.startsWith(")]}'")) {
+        data = JSON.parse(text.slice(5));
+      } else {
+        data = JSON.parse(text);
+      }
+
       return data;
     } catch (error) {
       console.error('Explore request failed:', error);
@@ -267,7 +271,11 @@ export class GoogleTrendsApi {
    */
   async interestByRegion({
     keyword,
-    startTime = new Date('2004-01-01'),
+    startTime = (() => {
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      return oneYearAgo;
+    })(),
     endTime = new Date(),
     geo = 'US',
     resolution = 'REGION',
@@ -279,32 +287,10 @@ export class GoogleTrendsApi {
       return date.toISOString().split('T')[0];
     };
 
-    const formatTrendsDate = (date: Date): string => {
-      const pad = (n: number) => n.toString().padStart(2, '0');
-      const yyyy = date.getFullYear();
-      const mm = pad(date.getMonth() + 1);
-      const dd = pad(date.getDate());
-      const hh = pad(date.getHours());
-      const min = pad(date.getMinutes());
-      const ss = pad(date.getSeconds());
-
-      return `${yyyy}-${mm}-${dd}T${hh}\\:${min}\\:${ss}`;
-    };
-
-    const getDateRangeParam = (date: Date) => {
-      const yesterday = new Date(date);
-      yesterday.setDate(date.getDate() - 1);
-
-      const formattedStart = formatTrendsDate(yesterday);
-      const formattedEnd = formatTrendsDate(date);
-
-      return `${formattedStart} ${formattedEnd}`;
-    };
-
     const exploreResponse = await this.explore({
       keyword: Array.isArray(keyword) ? keyword[0] : keyword,
       geo: Array.isArray(geo) ? geo[0] : geo,
-      time: `${getDateRangeParam(startTime)} ${getDateRangeParam(endTime)}`,
+      time: `${formatDate(startTime)} ${formatDate(endTime)}`,
       category,
       hl,
     });
@@ -330,7 +316,7 @@ export class GoogleTrendsApi {
               complexKeywordsRestriction: {
                 keyword: [
                   {
-                    type: 'BROAD', //'ENTITY',
+                    type: 'BROAD',
                     value: Array.isArray(keyword) ? keyword[0] : keyword,
                   },
                 ],
@@ -341,11 +327,11 @@ export class GoogleTrendsApi {
           locale: hl,
           requestOptions: {
             property: '',
-            backend: 'CM', //'IZG',
+            backend: 'IZG',
             category,
           },
           userConfig: {
-            userType: 'USER_TYPE_LEGIT_USER',
+            userType: 'USER_TYPE_SCRAPER',
           },
         }),
         token: widget.token,
@@ -355,10 +341,16 @@ export class GoogleTrendsApi {
     try {
       const response = await request(options.url, options);
       const text = await response.text();
-      // Remove the first 5 characters (JSONP wrapper) and parse
-      const data = JSON.parse(text.slice(5));
+      let data;
+      if (text.startsWith(")]}'")) {
+        data = JSON.parse(text.slice(5));
+      } else {
+        data = JSON.parse(text);
+      }
+
       return data;
     } catch (error) {
+      console.error('InterestByRegion request failed:', error);
       return { default: { geoMapData: [] } };
     }
   }

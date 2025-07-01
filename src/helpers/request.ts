@@ -43,12 +43,27 @@ export const request = async (
     bodyString = JSON.stringify(options.body);
   }
 
+  // Build query string with special handling for 'req' parameter
+  const buildQueryString = (params: Record<string, any>): string => {
+    return Object.entries(params)
+      .map(([key, value]) => {
+        if (key === 'req') {
+          // For 'req' parameter, use encodeURIComponent but preserve colons and commas
+          const encodedValue = encodeURIComponent(value)
+            .replace(/%3A/g, ':') // Preserve colons
+            .replace(/%2C/g, ','); // Preserve commas
+          return `${key}=${encodedValue}`;
+        } else {
+          return `${key}=${encodeURIComponent(value)}`;
+        }
+      })
+      .join('&');
+  };
+
   const requestOptions: https.RequestOptions = {
     hostname: parsedUrl.hostname,
     port: parsedUrl.port || 443,
-    path: `${parsedUrl.pathname}${
-      options.qs ? `?${new URLSearchParams(options.qs as Record<string, string>).toString()}` : ''
-    }`,
+    path: `${parsedUrl.pathname}${options.qs ? `?${buildQueryString(options.qs)}` : ''}`,
     method,
     headers: {
       ...(options.headers || {}),

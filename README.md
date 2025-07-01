@@ -228,7 +228,7 @@ interface RealTimeTrendsOptions {
 interface ExploreOptions {
   keyword: string;
   geo?: string; // Default: 'US'
-  time?: string; // Default: 'today 12-m'
+  time?: string; // Default: 'now 1-d'
   category?: number; // Default: 0
   property?: string; // Default: ''
   hl?: string; // Default: 'en-US'
