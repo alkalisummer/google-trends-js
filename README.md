@@ -139,7 +139,7 @@ Get widget data for a keyword:
 const result = await GoogleTrendsApi.explore({
   keyword: 'bitcoin',
   geo: 'US', // Default: 'US'
-  time: 'today 12-m', // Default: 'today 12-m'
+  time: '2025-06-30 2025-07-01', // Default: 'now 1-d'
   category: 0, // Default: 0
   property: '', // Default: ''
   hl: 'en-US', // Default: 'en-US'
@@ -162,7 +162,7 @@ Get interest data by region:
 ```typescript
 const result = await GoogleTrendsApi.interestByRegion({
   keyword: 'Stock Market', // Required - string or string[]
-  startTime: new Date('2024-01-01'), // Optional - defaults to 2004-01-01
+  startTime: new Date('2024-01-01'), // Optional - defaults: yesterday
   endTime: new Date(), // Optional - defaults to current date
   geo: 'US', // Optional - string or string[] - defaults to 'US'
   resolution: 'REGION', // Optional - 'COUNTRY' | 'REGION' | 'CITY' | 'DMA'
