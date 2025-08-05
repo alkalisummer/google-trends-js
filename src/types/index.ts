@@ -84,7 +84,7 @@ export type InterestTrend = [number, number, number[]];
 
 export interface DailyTrendingTopics {
   allTrendingStories: TrendingStory[];
-  summary: TrendingTopic[];
+  summary: TrendingKeyword[];
 }
 
 // Real Time Trends

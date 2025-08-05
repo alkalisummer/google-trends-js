@@ -62,7 +62,7 @@ const updateTrendsResponseObject = (data: unknown[]): TrendingKeyword[] => {
   const trends: TrendingKeyword[] = [];
 
   data.forEach((item) => {
-    if (!Array.isArray(item) || item[4] !== null) return;
+    if (!Array.isArray(item)) return;
 
     const trendsInfo = {
       keyword: String(item[0] || ''),
