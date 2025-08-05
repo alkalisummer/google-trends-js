@@ -47,9 +47,9 @@ export interface TrendingStory {
 
 export interface TrendingKeyword {
   keyword: string;
-  traffic: string;
-  trafficGrowthRate: string;
-  activeTime: string;
+  traffic: number;
+  trafficGrowthRate: number;
+  activeTime: Date;
   relatedKeywords: string[];
   articleKeys: ArticleKey[];
 }
@@ -76,7 +76,7 @@ export interface InterestOverTimeOptions {
 
 export interface Interest {
   keyword: string;
-  dates: string[];
+  dates: Date[];
   values: number[];
 }
 
