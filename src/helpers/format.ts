@@ -1,4 +1,12 @@
-import { TrendingKeyword, GoogleTrendsType, Article, Interest, InterestTrend } from '../types';
+import {
+  TrendingKeyword,
+  GoogleTrendsType,
+  Article,
+  Interest,
+  InterestTrend,
+  InterestRow,
+  TimestampTuple,
+} from '../types';
 import { ParseError } from '../errors/GoogleTrendsError';
 
 // For future refrence and update: from google trends page rpc call response,
@@ -99,29 +107,40 @@ const updateArticlesResponseObject = (data: unknown[]): Article[] => {
   return articles;
 };
 
-const updateInterestResponseObject = (data: unknown[][]): Interest => {
-  if (!Array.isArray(data)) {
-    throw new ParseError('Invalid data format: expected array');
-  }
+const tsToMs = (t: TimestampTuple) => (t[0] + (t[1] ?? 0) / 1e9) * 1000;
 
-  const keyword = String(data[0][0] || '');
+export function updateInterestResponseObject(
+  data: unknown[][],
+  opts: { align?: 'mid' | 'start' | 'end'; includePartial?: boolean } = { align: 'mid', includePartial: true },
+): Interest {
+  if (!Array.isArray(data) || !Array.isArray(data[0])) throw new Error('Invalid data format');
+
+  const row = data[0] as unknown as InterestRow;
+  const keyword = String(row[0] ?? '');
+  const trends = (row[4] ?? []) as InterestTrend[];
+
   const dates: Date[] = [];
   const values: number[] = [];
 
-  const trends = data[0][4] as InterestTrend[];
+  for (const [value, _rounded, [start, end], isPartial] of trends) {
+    if (!Array.isArray(start) || !Array.isArray(end)) continue;
+    if (!opts.includePartial && isPartial) continue;
 
-  for (const [value, _rounded, range, isPartial] of trends) {
-    const startSec = range?.[0]?.[0] as number;
-    const endSec = range?.[1]?.[0] as number;
-    if (startSec == null || endSec == null || isPartial) continue;
+    const sm = tsToMs(start);
+    const em = tsToMs(end);
+    const xm = opts.align === 'start' ? sm : opts.align === 'end' ? em : (sm + em) / 2; // mid
 
-    dates.push(new Date(startSec * 1000));
+    dates.push(new Date(xm));
     values.push(typeof value === 'number' ? value : 0);
   }
 
+  const idx = dates
+    .map((d, i) => [d.getTime(), i] as const)
+    .sort((a, b) => a[0] - b[0])
+    .map(([, i]) => i);
   return {
     keyword,
-    dates,
-    values,
+    dates: idx.map((i) => dates[i]),
+    values: idx.map((i) => values[i]),
   };
-};
+}
