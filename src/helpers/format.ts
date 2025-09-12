@@ -110,36 +110,14 @@ const updateInterestResponseObject = (data: unknown[][]): Interest => {
 
   const trends = data[0][4] as InterestTrend[];
 
-  trends.forEach((trend) => {
-    const primaryValue = trend[0];
-    const primaryTimestamps = trend[2];
+  for (const [value, _rounded, range, isPartial] of trends) {
+    const startSec = range?.[0]?.[0] as number;
+    const endSec = range?.[1]?.[0] as number;
+    if (startSec == null || endSec == null || isPartial) continue;
 
-    if (
-      typeof primaryValue === 'number' &&
-      primaryValue !== 0 &&
-      Array.isArray(primaryTimestamps) &&
-      primaryTimestamps.length > 0
-    ) {
-      const primaryTimestampMs = primaryTimestamps[0] * 1000;
-      const primaryDate = new Date(primaryTimestampMs);
-      values.push(primaryValue);
-      dates.push(primaryDate);
-    }
-
-    const secondaryValue = trend[1];
-    const secondaryTimestamps = trend[3];
-    if (
-      typeof secondaryValue === 'number' &&
-      secondaryValue !== 0 &&
-      Array.isArray(secondaryTimestamps) &&
-      secondaryTimestamps.length > 0
-    ) {
-      const secondaryTimestampMs = secondaryTimestamps[0] * 1000;
-      const secondaryDate = new Date(secondaryTimestampMs);
-      values.push(secondaryValue);
-      dates.push(secondaryDate);
-    }
-  });
+    dates.push(new Date(startSec * 1000));
+    values.push(typeof value === 'number' ? value : 0);
+  }
 
   return {
     keyword,

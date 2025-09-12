@@ -80,7 +80,14 @@ export interface Interest {
   values: number[];
 }
 
-export type InterestTrend = [number, number, number[], number[]];
+export type Seconds = number;
+export type Nanos = number;
+
+export type TimestampTuple = [Seconds] | [Seconds, Nanos];
+
+export type RangeTuple = [start: TimestampTuple, end: TimestampTuple];
+
+export type InterestTrend = [value: number, rounded: number, range: RangeTuple, isPartial: boolean];
 
 export interface DailyTrendingTopics {
   allTrendingStories: TrendingStory[];
