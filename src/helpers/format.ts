@@ -113,18 +113,22 @@ const updateInterestResponseObject = (data: unknown[][]): Interest => {
   trends.forEach((trend) => {
     const primaryValue = trend[0];
     const primaryTimestamps = trend[2];
+
+    if (typeof primaryValue === 'number' && Array.isArray(primaryTimestamps) && primaryTimestamps.length > 0) {
+      const primaryTimestampMs = primaryTimestamps[0] * 1000;
+      const primaryDate = new Date(primaryTimestampMs);
+      values.push(primaryValue);
+      dates.push(primaryDate);
+    }
+
     const secondaryValue = trend[1];
     const secondaryTimestamps = trend[3];
-
-    const primaryTimestamp = primaryTimestamps[0] * 1000;
-    const secondaryTimestamp = secondaryTimestamps[0] * 1000;
-    const primaryDateObj = new Date(primaryTimestamp);
-    const secondaryDateObj = new Date(secondaryTimestamp);
-
-    values.push(primaryValue);
-    dates.push(primaryDateObj);
-    values.push(secondaryValue);
-    dates.push(secondaryDateObj);
+    if (typeof secondaryValue === 'number' && Array.isArray(secondaryTimestamps) && secondaryTimestamps.length > 0) {
+      const secondaryTimestampMs = secondaryTimestamps[0] * 1000;
+      const secondaryDate = new Date(secondaryTimestampMs);
+      values.push(secondaryValue);
+      dates.push(secondaryDate);
+    }
   });
 
   return {
