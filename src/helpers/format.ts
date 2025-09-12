@@ -114,7 +114,12 @@ const updateInterestResponseObject = (data: unknown[][]): Interest => {
     const primaryValue = trend[0];
     const primaryTimestamps = trend[2];
 
-    if (typeof primaryValue === 'number' && Array.isArray(primaryTimestamps) && primaryTimestamps.length > 0) {
+    if (
+      typeof primaryValue === 'number' &&
+      primaryValue !== 0 &&
+      Array.isArray(primaryTimestamps) &&
+      primaryTimestamps.length > 0
+    ) {
       const primaryTimestampMs = primaryTimestamps[0] * 1000;
       const primaryDate = new Date(primaryTimestampMs);
       values.push(primaryValue);
@@ -123,7 +128,12 @@ const updateInterestResponseObject = (data: unknown[][]): Interest => {
 
     const secondaryValue = trend[1];
     const secondaryTimestamps = trend[3];
-    if (typeof secondaryValue === 'number' && Array.isArray(secondaryTimestamps) && secondaryTimestamps.length > 0) {
+    if (
+      typeof secondaryValue === 'number' &&
+      secondaryValue !== 0 &&
+      Array.isArray(secondaryTimestamps) &&
+      secondaryTimestamps.length > 0
+    ) {
       const secondaryTimestampMs = secondaryTimestamps[0] * 1000;
       const secondaryDate = new Date(secondaryTimestampMs);
       values.push(secondaryValue);
