@@ -66,9 +66,9 @@ const updateTrendsResponseObject = (data: unknown[]): TrendingKeyword[] => {
 
     const trendsInfo = {
       keyword: String(item[0] || ''),
-      traffic: String(item[6] || '0'),
-      trafficGrowthRate: String(item[8] || '0'),
-      activeTime: String(item[3] || '0'),
+      traffic: Number(item[6] || '0'),
+      trafficGrowthRate: Number(item[8] || '0'),
+      activeTime: new Date(Number(item[3] || '0') * 1_000),
       relatedKeywords: item[9] || [],
       articleKeys: item[11] || [],
     };
@@ -105,7 +105,7 @@ const updateInterestResponseObject = (data: unknown[][]): Interest => {
   }
 
   const keyword = String(data[0][0] || '');
-  const dates: string[] = [];
+  const dates: Date[] = [];
   const values: number[] = [];
 
   const trends = data[0][4] as InterestTrend[];
@@ -117,16 +117,8 @@ const updateInterestResponseObject = (data: unknown[][]): Interest => {
     const timestamp = timestamps[0] * 1000;
     const dateObj = new Date(timestamp);
 
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const hours = String(dateObj.getHours()).padStart(2, '0');
-    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-
-    const formatted = `${year}-${month}-${day} ${hours}:${minutes}`;
-
     values.push(value);
-    dates.push(formatted);
+    dates.push(dateObj);
   });
 
   return {

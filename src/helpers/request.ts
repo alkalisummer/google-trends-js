@@ -22,8 +22,8 @@ export const request = async (
   url: string,
   options: {
     method?: string;
-    qs?: Record<string, any>;
-    body?: string | Record<string, any>;
+    qs?: Record<string, string>;
+    body?: string | Record<string, string>;
     headers?: Record<string, string>;
     contentType?: 'json' | 'form';
   },
@@ -44,7 +44,7 @@ export const request = async (
   }
 
   // Build query string with special handling for 'req' parameter
-  const buildQueryString = (params: Record<string, any>): string => {
+  const buildQueryString = (params: Record<string, string>): string => {
     return Object.entries(params)
       .map(([key, value]) => {
         if (key === 'req') {
