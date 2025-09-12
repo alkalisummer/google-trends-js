@@ -80,7 +80,7 @@ export interface Interest {
   values: number[];
 }
 
-export type InterestTrend = [number, number, number[]];
+export type InterestTrend = [number, number, number[], number[]];
 
 export interface DailyTrendingTopics {
   allTrendingStories: TrendingStory[];
