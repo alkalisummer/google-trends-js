@@ -4,8 +4,8 @@ import {
   Article,
   Interest,
   InterestTrend,
-  InterestRow,
   TimestampTuple,
+  UpdateInterestOptions,
 } from '../types';
 import { ParseError } from '../errors/GoogleTrendsError';
 
@@ -111,11 +111,11 @@ const tsToMs = (t: TimestampTuple) => (t[0] + (t[1] ?? 0) / 1e9) * 1000;
 
 export function updateInterestResponseObject(
   data: unknown[][],
-  opts: { align?: 'mid' | 'start' | 'end'; includePartial?: boolean } = { align: 'mid', includePartial: true },
+  opts: UpdateInterestOptions = { align: 'mid', includePartial: true },
 ): Interest {
   if (!Array.isArray(data) || !Array.isArray(data[0])) throw new Error('Invalid data format');
 
-  const row = data[0] as unknown as InterestRow;
+  const row = data[0];
   const keyword = String(row[0] ?? '');
   const trends = (row[4] ?? []) as InterestTrend[];
 
@@ -135,7 +135,7 @@ export function updateInterestResponseObject(
   }
 
   const idx = dates
-    .map((d, i) => [d.getTime(), i] as const)
+    .map((d, i) => [d.getTime(), i])
     .sort((a, b) => a[0] - b[0])
     .map(([, i]) => i);
   return {

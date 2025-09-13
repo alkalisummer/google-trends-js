@@ -89,14 +89,12 @@ export type RangeTuple = [start: TimestampTuple, end: TimestampTuple];
 
 export type InterestTrend = [value: number, rounded: number, range: RangeTuple, isPartial: boolean];
 
-export type InterestRow = [
-  keyword: string,
-  _u1?: unknown,
-  _u2?: unknown,
-  bucketMeta?: number,
-  buckets?: InterestTrend[],
-  ...rest: unknown[],
-];
+export type UpdateInterestAlign = 'mid' | 'start' | 'end';
+
+export interface UpdateInterestOptions {
+  align?: UpdateInterestAlign;
+  includePartial?: boolean;
+}
 
 export interface DailyTrendingTopics {
   allTrendingStories: TrendingStory[];
