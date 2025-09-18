@@ -44,9 +44,9 @@ const result = await GoogleTrendsApi.dailyTrends({
 // {
 //   data?: Array<{
 //     keyword: string;
-//     traffic: string;
-//     trafficGrowthRate: string;
-//     activeTime: string;
+//     traffic: number;
+//     trafficGrowthRate: number;
+//     activeTime: date;
 //     relatedKeywords: string[];
 //     articleKeys: ArticleKey[];
 //   }>,

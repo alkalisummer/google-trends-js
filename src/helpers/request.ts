@@ -5,8 +5,8 @@ let cookieVal: string | undefined;
 function rereq(options: https.RequestOptions, body?: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
-      const chunks: Buffer[] = [];
-      res.on('data', (data) => {
+      const chunks: Uint8Array[] = [];
+      res.on('data', (data: Uint8Array) => {
         chunks.push(data);
       });
       res.on('end', () => resolve(Buffer.concat(chunks).toString()));
@@ -77,9 +77,9 @@ export const request = async (
 
   const response = await new Promise<string>((resolve, reject) => {
     const req = https.request(requestOptions, (res) => {
-      const chunks: Buffer[] = [];
+      const chunks: Uint8Array[] = [];
 
-      res.on('data', (data) => {
+      res.on('data', (data: Uint8Array) => {
         chunks.push(data);
       });
 
