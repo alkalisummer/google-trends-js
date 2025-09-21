@@ -177,9 +177,7 @@ export class GoogleTrendsApi {
    * @returns Promise with interest over time data
    */
   async interestOverTime({ keyword, geo = 'US', hl = 'en-US', period = 'now 1-d' }: InterestOverTimeOptions) {
-    console.log('interestOverTime', keyword, geo, hl, period);
     const explore = await this.explore({ keyword, geo, hl, time: period });
-    console.log('explore', explore);
     const widget = explore.widgets.find((w) => w.id === 'TIMESERIES');
 
     if (!widget || !widget.token) {
