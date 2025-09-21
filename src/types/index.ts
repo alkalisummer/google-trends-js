@@ -71,16 +71,16 @@ export interface Article {
 }
 
 export interface InterestOverTimeOptions {
-  keyword: string;
+  keyword: string | string[];
   geo?: string;
   period?: GoogleTrendsTimeOptions;
   hl?: string;
 }
 
 export interface Interest {
-  keyword: string;
+  keyword: string | string[];
   dates: Date[];
-  values: number[];
+  values: number[][];
 }
 
 export type Seconds = number;
@@ -126,7 +126,7 @@ export type GoogleTrendsTimeOptions =
 // Explore
 
 export type ExploreOptions = {
-  keyword: string;
+  keyword: string | string[];
   geo?: string;
   time?: string;
   category?: number;

@@ -19,7 +19,7 @@ import { ParseError } from '../errors/GoogleTrendsError';
 export const extractJsonFromResponse = (
   text: string,
   type: GoogleTrendsType,
-  keyword?: string,
+  keyword?: string | string[],
 ): TrendingKeyword[] | Article[] | Interest | null => {
   const cleanedText = text.replace(/^\)\]\}',?\s*/, '').trim();
   try {
@@ -111,7 +111,7 @@ export const updateInterestResponseObject = ({
   opts = { align: 'mid', includePartial: true },
 }: {
   data: unknown;
-  keyword: string;
+  keyword: string | string[];
   opts?: UpdateInterestOptions;
 }): Interest => {
   const timelineData = pickTimelineData(data);
@@ -120,7 +120,7 @@ export const updateInterestResponseObject = ({
   }
 
   const dates: Date[] = [];
-  const values: number[] = [];
+  const values: number[][] = [];
 
   for (const point of timelineData) {
     const isPartial = Boolean(point.isPartial);
@@ -130,10 +130,10 @@ export const updateInterestResponseObject = ({
     const timeSec = timeStr ? Number(timeStr) : NaN;
     if (!Number.isFinite(timeSec)) continue;
 
-    const valueArr = point.value;
-    const firstVal = Array.isArray(valueArr) ? valueArr[0] : undefined;
+    const valueArr = point.value as number[];
+    values.push(valueArr.slice());
+
     dates.push(new Date(timeSec * 1000));
-    values.push(typeof firstVal === 'number' ? firstVal : 0);
   }
   const idx = dates
     .map((d, i) => [d.getTime(), i])

@@ -14,11 +14,11 @@ npm install @alkalisummer/google-trends-js
 
 - Get daily trending topics
 - Get real-time trending topics
-- Get articles releated trening topics
+- Get articles related to trending topics
 - Get autocomplete suggestions
 - Explore trends data
 - Get interest by region data
-- Get interest change timeline by trending topics
+- Get interest over time (timeline) for keywords
 - TypeScript support
 - Promise-based API
 
@@ -46,7 +46,7 @@ const result = await GoogleTrendsApi.dailyTrends({
 //     keyword: string;
 //     traffic: number;
 //     trafficGrowthRate: number;
-//     activeTime: date;
+//     activeTime: Date;
 //     relatedKeywords: string[];
 //     articleKeys: ArticleKey[];
 //   }>,
@@ -86,7 +86,7 @@ Get interest over time data for a specific keyword:
 
 ```typescript
 const result = await GoogleTrendsApi.interestOverTime({
-  keyword: 'bitcoin',
+  keyword: 'bitcoin', // or an array of keywords
   geo: 'US', //Default: 'US'
   period: 'now 7-d', // Default: 'now 1-d'
   hl: 'en-US', // Default: 'en-US'
@@ -95,12 +95,27 @@ const result = await GoogleTrendsApi.interestOverTime({
 // Result structure:
 // {
 //   data?: {
-//     keyword: string;
+//     keyword: string | string[];
 //     dates: Date[];
-//     values: number[];
+//     values: number[][]; // one series per keyword (for single keyword: a single inner array)
 //   },
 //   error?: GoogleTrendsError
 // }
+```
+
+Multiple keywords example:
+
+```typescript
+const result = await GoogleTrendsApi.interestOverTime({
+  keyword: ['bitcoin', 'ethereum'],
+  geo: 'US',
+  period: 'today 12-m',
+});
+
+if (result.data) {
+  // result.data.values is number[][] where
+  // values[i] corresponds to the i-th sorted date in result.data.dates
+}
 ```
 
 ### Real-Time Trends
@@ -215,10 +230,10 @@ const result = await GoogleTrendsApi.interestByRegion({
 
 ## API Reference
 
-### DailyTrendsOptions
+### DailyTrendingTopicsOptions
 
 ```typescript
-interface DailyTrendsOptions {
+interface DailyTrendingTopicsOptions {
   geo?: string; // Default: 'US'
   hl?: string; // Default: 'en'
 }
@@ -237,7 +252,7 @@ interface RealTimeTrendsOptions {
 
 ```typescript
 interface ExploreOptions {
-  keyword: string;
+  keyword: string | string[];
   geo?: string; // Default: 'US'
   time?: string; // Default: 'now 1-d'
   category?: number; // Default: 0
@@ -276,7 +291,7 @@ type ArticleKey = [number, string, string]; // [index, lang, geo]
 
 ```typescript
 interface InterestOverTimeOptions {
-  keyword: string; // Required - search term
+  keyword: string | string[]; // Required - search term(s)
   geo?: string; // Optional - geocode (default: 'US')
   period?: 'now 1-H' | 'now 4-H' | 'now 1-d' | 'now 7-d' | 'now 1-m' | 'today 3-m' | 'today 12-m' | 'today 5-y'; // Optional - time period (default: 'now 1-d')
   hl?: string; // Optional - language (default: 'en-US')

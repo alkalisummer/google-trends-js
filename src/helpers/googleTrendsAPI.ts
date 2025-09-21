@@ -239,11 +239,9 @@ export class GoogleTrendsApi {
         hl,
         req: JSON.stringify({
           comparisonItem: [
-            {
-              keyword,
-              geo,
-              time,
-            },
+            ...(Array.isArray(keyword)
+              ? keyword.map((val) => ({ keyword: val, geo, time }))
+              : [{ keyword, geo, time }]),
           ],
           category,
           property,
