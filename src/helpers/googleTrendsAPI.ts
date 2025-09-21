@@ -12,7 +12,6 @@ import {
   TrendingKeyword,
   ArticleKey,
   Article,
-  Interest,
 } from '../types/index';
 import { request } from './request';
 import { extractJsonFromResponse } from './format';
@@ -173,22 +172,35 @@ export class GoogleTrendsApi {
    * Get interest over time
    * @param keyword - Keyword to get interest over time for
    * @param geo - Country code (default: 'US')
+   * @param hl - Language code (default: 'en-US')
+   * @param period - Time period for the interest over time
    * @returns Promise with interest over time data
    */
-  async interestOverTime({ keyword, geo }: InterestOverTimeOptions): Promise<GoogleTrendsResponse<Interest>> {
-    const defaultOptions = GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.dailyTrends];
+  async interestOverTime({ keyword, geo = 'US', hl = 'en-US', period = 'now 1-d' }: InterestOverTimeOptions) {
+    const explore = await this.explore({ keyword, geo, hl, time: period });
+    const widget = explore.widgets.find((w) => w.id === 'TIMESERIES');
+
+    if (!widget || !widget.token) {
+      return { error: new ParseError('TIMESERIES widget or token not found') };
+    }
+
+    const defaultOptions = GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.interestOverTime];
+    const widgetRequest = widget.request;
+
     const options = {
       ...defaultOptions,
-      body: new URLSearchParams({
-        'f.req': `[[["g4kJzf","[[[\\"${geo}\\",\\"${keyword}\\",3,null,3]]]",null,"generic"]]]`,
-      }).toString(),
-      contentType: 'form' as const,
+      qs: {
+        hl,
+        tz: new Date().getTimezoneOffset().toString(),
+        req: JSON.stringify(widgetRequest),
+        token: widget.token,
+      },
     };
 
     try {
       const response = await request(options.url, options);
       const text = await response.text();
-      const interest = extractJsonFromResponse(text, 'interest') as Interest;
+      const interest = extractJsonFromResponse(text, 'interest', keyword);
 
       if (!interest) {
         return { error: new ParseError() };
@@ -225,7 +237,6 @@ export class GoogleTrendsApi {
       ...GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.explore],
       qs: {
         hl,
-        tz: new Date().getTimezoneOffset().toString(),
         req: JSON.stringify({
           comparisonItem: [
             {
@@ -237,6 +248,7 @@ export class GoogleTrendsApi {
           category,
           property,
         }),
+        tz: new Date().getTimezoneOffset().toString(),
       },
     };
 

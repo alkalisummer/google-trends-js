@@ -26,7 +26,9 @@ export const GOOGLE_TRENDS_MAPPER: Record<GoogleTrendsEndpoints, GoogleTrendsMap
     method: 'POST',
     host: GOOGLE_TRENDS_BASE_URL,
     url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/explore`,
-    headers: {},
+    headers: {
+      accept: ' */*',
+    },
   },
   [GoogleTrendsEndpoints.interestByRegion]: {
     path: '/trends/api/widgetdata/comparedgeo',
@@ -35,6 +37,15 @@ export const GOOGLE_TRENDS_MAPPER: Record<GoogleTrendsEndpoints, GoogleTrendsMap
     url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/widgetdata/comparedgeo`,
     headers: {
       accept: 'application/json, text/plain, */*',
+    },
+  },
+  [GoogleTrendsEndpoints.interestOverTime]: {
+    path: '/trends/api/widgetdata/multiline',
+    method: 'GET',
+    host: GOOGLE_TRENDS_BASE_URL,
+    url: `https://${GOOGLE_TRENDS_BASE_URL}/trends/api/widgetdata/multiline`,
+    headers: {
+      accept: '*/*',
     },
   },
 };

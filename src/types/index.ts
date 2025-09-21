@@ -11,6 +11,7 @@ export const enum GoogleTrendsEndpoints {
   autocomplete = 'autocomplete',
   explore = 'explore',
   interestByRegion = 'interestByRegion',
+  interestOverTime = 'interestOverTime',
 }
 
 // TRENDING TOPICS
@@ -71,7 +72,9 @@ export interface Article {
 
 export interface InterestOverTimeOptions {
   keyword: string;
-  geo: string;
+  geo?: string;
+  period?: GoogleTrendsTimeOptions;
+  hl?: string;
 }
 
 export interface Interest {
@@ -108,6 +111,18 @@ export type RealTimeTrendsOptions = {
   trendingHours?: number;
 };
 
+// Interest Over Time
+
+export type GoogleTrendsTimeOptions =
+  | 'now 1-h'
+  | 'now 4-h'
+  | 'now 1-d'
+  | 'now 7-d'
+  | 'now 1-m'
+  | 'today 3-m'
+  | 'today 12-m'
+  | 'today 5-y';
+
 // Explore
 
 export type ExploreOptions = {
@@ -123,6 +138,8 @@ export type ExploreResponse = {
   widgets: Array<{
     id: string;
     request: {
+      time: string;
+      resolution: string;
       comparisonItem: Array<{
         keyword: string;
         geo: string;

@@ -43,19 +43,11 @@ export const request = async (
     bodyString = JSON.stringify(options.body);
   }
 
-  // Build query string with special handling for 'req' parameter
+  // Build query string (standard URL encoding for all keys, including 'req')
   const buildQueryString = (params: Record<string, string>): string => {
     return Object.entries(params)
       .map(([key, value]) => {
-        if (key === 'req') {
-          // For 'req' parameter, use encodeURIComponent but preserve colons and commas
-          const encodedValue = encodeURIComponent(value)
-            .replace(/%3A/g, ':') // Preserve colons
-            .replace(/%2C/g, ','); // Preserve commas
-          return `${key}=${encodedValue}`;
-        } else {
-          return `${key}=${encodeURIComponent(value)}`;
-        }
+        return `${key}=${encodeURIComponent(value)}`;
       })
       .join('&');
   };
@@ -66,15 +58,18 @@ export const request = async (
     path: `${parsedUrl.pathname}${options.qs ? `?${buildQueryString(options.qs)}` : ''}`,
     method,
     headers: {
+      'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+      'Accept-Language': 'en-US,en;q=0.9',
       ...(options.headers || {}),
       ...(contentType === 'form'
         ? { 'Content-Type': 'application/x-www-form-urlencoded' }
         : { 'Content-Type': 'application/json' }),
       ...(bodyString ? { 'Content-Length': Buffer.byteLength(bodyString).toString() } : {}),
       ...(cookieVal ? { cookie: cookieVal } : {}),
+      referer: 'https://trends.google.com/',
     },
   };
-
   const response = await new Promise<string>((resolve, reject) => {
     const req = https.request(requestOptions, (res) => {
       const chunks: Uint8Array[] = [];
@@ -84,9 +79,16 @@ export const request = async (
       });
 
       res.on('end', async () => {
-        if (res.statusCode === 429 && res.headers['set-cookie']) {
-          cookieVal = res.headers['set-cookie'][0].split(';')[0];
-          if (requestOptions.headers) {
+        // Persist cookies from any response
+        if (res.headers['set-cookie'] && res.headers['set-cookie'].length > 0) {
+          const receivedCookies = res.headers['set-cookie'].map((cookieStr) => cookieStr.split(';')[0]).filter(Boolean);
+          if (receivedCookies.length > 0) {
+            cookieVal = receivedCookies.join('; ');
+          }
+        }
+
+        if (res.statusCode === 429) {
+          if (requestOptions.headers && cookieVal) {
             requestOptions.headers['cookie'] = cookieVal;
           }
           try {
@@ -95,9 +97,10 @@ export const request = async (
           } catch (err) {
             reject(err);
           }
-        } else {
-          resolve(Buffer.concat(chunks).toString());
+          return;
         }
+
+        resolve(Buffer.concat(chunks).toString());
       });
     });
 

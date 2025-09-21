@@ -1,12 +1,4 @@
-import {
-  TrendingKeyword,
-  GoogleTrendsType,
-  Article,
-  Interest,
-  InterestTrend,
-  TimestampTuple,
-  UpdateInterestOptions,
-} from '../types';
+import { TrendingKeyword, GoogleTrendsType, Article, Interest, UpdateInterestOptions } from '../types';
 import { ParseError } from '../errors/GoogleTrendsError';
 
 // For future refrence and update: from google trends page rpc call response,
@@ -27,10 +19,18 @@ import { ParseError } from '../errors/GoogleTrendsError';
 export const extractJsonFromResponse = (
   text: string,
   type: GoogleTrendsType,
+  keyword?: string,
 ): TrendingKeyword[] | Article[] | Interest | null => {
-  const cleanedText = text.replace(/^\)\]\}'/, '').trim();
+  const cleanedText = text.replace(/^\)\]\}',?\s*/, '').trim();
   try {
     const parsedResponse = JSON.parse(cleanedText);
+
+    if (type === 'interest') {
+      return updateInterestResponseObject({
+        data: parsedResponse,
+        keyword: keyword || '',
+      });
+    }
 
     if (!Array.isArray(parsedResponse) || parsedResponse.length === 0) {
       throw new ParseError('Invalid response format: empty array');
@@ -51,8 +51,6 @@ export const extractJsonFromResponse = (
         return updateTrendsResponseObject(data[1]);
       case 'articles':
         return updateArticlesResponseObject(data[0]);
-      case 'interest':
-        return updateInterestResponseObject(data[0]);
     }
   } catch (e: unknown) {
     if (e instanceof ParseError) {
@@ -107,33 +105,36 @@ const updateArticlesResponseObject = (data: unknown[]): Article[] => {
   return articles;
 };
 
-const tsToMs = (t: TimestampTuple) => (t[0] + (t[1] ?? 0) / 1e9) * 1000;
-
-export function updateInterestResponseObject(
-  data: unknown[][],
-  opts: UpdateInterestOptions = { align: 'mid', includePartial: true },
-): Interest {
-  if (!Array.isArray(data) || !Array.isArray(data[0])) throw new Error('Invalid data format');
-
-  const row = data[0];
-  const keyword = String(row[0] ?? '');
-  const trends = (row[4] ?? []) as InterestTrend[];
+export const updateInterestResponseObject = ({
+  data,
+  keyword,
+  opts = { align: 'mid', includePartial: true },
+}: {
+  data: unknown;
+  keyword: string;
+  opts?: UpdateInterestOptions;
+}): Interest => {
+  const timelineData = pickTimelineData(data);
+  if (!timelineData) {
+    throw new Error('Invalid data format');
+  }
 
   const dates: Date[] = [];
   const values: number[] = [];
 
-  for (const [value, _rounded, [start, end], isPartial] of trends) {
-    if (!Array.isArray(start) || !Array.isArray(end)) continue;
+  for (const point of timelineData) {
+    const isPartial = Boolean(point.isPartial);
     if (!opts.includePartial && isPartial) continue;
 
-    const sm = tsToMs(start);
-    const em = tsToMs(end);
-    const xm = opts.align === 'start' ? sm : opts.align === 'end' ? em : (sm + em) / 2; // mid
+    const timeStr = point.time;
+    const timeSec = timeStr ? Number(timeStr) : NaN;
+    if (!Number.isFinite(timeSec)) continue;
 
-    dates.push(new Date(xm));
-    values.push(typeof value === 'number' ? value : 0);
+    const valueArr = point.value;
+    const firstVal = Array.isArray(valueArr) ? valueArr[0] : undefined;
+    dates.push(new Date(timeSec * 1000));
+    values.push(typeof firstVal === 'number' ? firstVal : 0);
   }
-
   const idx = dates
     .map((d, i) => [d.getTime(), i])
     .sort((a, b) => a[0] - b[0])
@@ -143,4 +144,16 @@ export function updateInterestResponseObject(
     dates: idx.map((i) => dates[i]),
     values: idx.map((i) => values[i]),
   };
-}
+};
+
+const pickTimelineData = (input: unknown): Array<Record<string, unknown>> | null => {
+  if (!input || typeof input !== 'object') return null;
+  const maybeDefault = (input as Record<string, unknown>).default;
+  const root =
+    maybeDefault && typeof maybeDefault === 'object'
+      ? (maybeDefault as Record<string, unknown>)
+      : (input as Record<string, unknown>);
+  const timeline = root.timelineData;
+  if (Array.isArray(timeline)) return timeline as Array<Record<string, unknown>>;
+  return null;
+};

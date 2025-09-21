@@ -87,14 +87,16 @@ Get interest over time data for a specific keyword:
 ```typescript
 const result = await GoogleTrendsApi.interestOverTime({
   keyword: 'bitcoin',
-  geo: 'US', // Default: 'US'
+  geo: 'US', //Default: 'US'
+  period: 'now 7-d', // Default: 'now 1-d'
+  hl: 'en-US', // Default: 'en-US'
 });
 
 // Result structure:
 // {
 //   data?: {
 //     keyword: string;
-//     dates: string[];
+//     dates: Date[];
 //     values: number[];
 //   },
 //   error?: GoogleTrendsError
@@ -111,10 +113,17 @@ const result = await GoogleTrendsApi.realTimeTrends({
   trendingHours: 4, // Default: 4
 });
 
-// Result structure:
+// Result structure (wrapped):
 // {
-//   allTrendingStories: Array<...>,
-//   summary: string[]
+//   data?: Array<{
+//     keyword: string;
+//     traffic: number;
+//     trafficGrowthRate: number;
+//     activeTime: Date;
+//     relatedKeywords: string[];
+//     articleKeys: ArticleKey[];
+//   }>,
+//   error?: GoogleTrendsError
 // }
 ```
 
@@ -128,7 +137,9 @@ const suggestions = await GoogleTrendsApi.autocomplete(
   'en-US', // Language (default: 'en-US')
 );
 
-// Returns: string[]
+if (suggestions.data) {
+  // suggestions.data is string[]
+}
 ```
 
 ### Explore
@@ -267,6 +278,8 @@ type ArticleKey = [number, string, string]; // [index, lang, geo]
 interface InterestOverTimeOptions {
   keyword: string; // Required - search term
   geo?: string; // Optional - geocode (default: 'US')
+  period?: 'now 1-h' | 'now 4-h' | 'now 1-d' | 'now 7-d' | 'now 1-m' | 'today 3-m' | 'today 12-m' | 'today 5-y'; // Optional - time period (default: 'now 1-d')
+  hl?: string; // Optional - language (default: 'en-US')
 }
 ```
 
