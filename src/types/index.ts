@@ -114,8 +114,8 @@ export type RealTimeTrendsOptions = {
 // Interest Over Time
 
 export type GoogleTrendsTimeOptions =
-  | 'now 1-h'
-  | 'now 4-h'
+  | 'now 1-H'
+  | 'now 4-H'
   | 'now 1-d'
   | 'now 7-d'
   | 'now 1-m'

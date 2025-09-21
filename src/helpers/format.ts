@@ -114,6 +114,7 @@ export const updateInterestResponseObject = ({
   keyword: string;
   opts?: UpdateInterestOptions;
 }): Interest => {
+  console.log('data', data);
   const timelineData = pickTimelineData(data);
   if (!timelineData) {
     throw new Error('Invalid data format');
