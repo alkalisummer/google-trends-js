@@ -34,7 +34,7 @@ export class GoogleTrendsApi {
       ...GOOGLE_TRENDS_MAPPER[GoogleTrendsEndpoints.autocomplete],
       qs: {
         hl,
-        tz: '240',
+        tz: new Date().getTimezoneOffset().toString(),
       },
     };
 
