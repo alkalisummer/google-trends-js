@@ -2,7 +2,12 @@
 
 This is a TypeScript library that has been updated to incorporate the latest changes to the Google Trends API endpoints. This package provides a simple and type-safe way to access Google Trends data programmatically.
 
-This API was developed based on @shaivpidadi/trends-js with some added and modified features.
+This API was developed based on @shaivpidadi/trends-js with some added and modified features. 
+
+The following changes and additions have been made:
+- Daily Trends : Added relatedKeywords and activeTime.
+- Trending Articles : Retrieves information about articles related to trending keywords.
+- Interest Over Time : Retrieves time-series interest data for trending keywords.
 
 ## Installation
 
